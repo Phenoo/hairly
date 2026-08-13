@@ -1,10 +1,10 @@
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,600;1,500;1,600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,500;0,600;1,500;1,600&display=swap');
 @import "tailwindcss";
 
-:root { --ink:#201d1b; --muted:#77706b; --cream:#f6f3ee; --paper:#fbfaf8; --line:#ddd8d2; --gold:#b4865c; --dark:#24201e; --serif:'Playfair Display', Georgia, serif; --sans:'DM Sans', Arial, sans-serif; }
+:root { --ink:#201d1b; --muted:#77706b; --cream:#f6f3ee; --paper:#fbfaf8; --line:#ddd8d2; --gold:#b4865c; --dark:#24201e; --serif:'Playfair Display', Georgia, serif; --sans:'Manrope', Arial, sans-serif; }
 * { box-sizing:border-box; }
 html { scroll-behavior:smooth; }
-body { margin:0; background:var(--paper); color:var(--ink); font-family:var(--sans); font-size:14px; }
+body { margin:0; background:var(--paper); color:var(--ink); font-family:var(--sans); font-size:16px; line-height:1.55; }
 button,input,select,textarea { font:inherit; }
 button,a { -webkit-tap-highlight-color:transparent; }
 button { border:0; cursor:pointer; color:inherit; background:transparent; }
@@ -447,3 +447,42 @@ em { font-style:italic; color:var(--gold); }
   .contact-details a { align-items:flex-start; flex-direction:column; gap:5px; }
 }
 @media (prefers-reduced-motion: reduce) { *,*::before,*::after { animation-duration:.01ms !important; animation-iteration-count:1 !important; transition-duration:.01ms !important; scroll-behavior:auto !important; } }
+
+/* Readability pass: the commerce UI stays refined while all essential copy gets more breathing room. */
+p { font-size:16px; line-height:1.75; }
+.eyebrow,.kicker { font-size:11px; }
+.desktop-nav button,.header-sub button,.icon-label,.header-sub button { font-size:12px; }
+.button,.text-button,.quick-add,.filter-pills button,.shop-meta button,.footer-col > span { font-size:11px; }
+.trust-grid span,.footer-col button,.footer-col a,.footer-col p,.hours,.newsletter small,.whatsapp-float small { font-size:13px; }
+.trust-grid strong { font-size:13px; }
+.hero-copy > p,.routine-copy p,.edit-copy p,.store-copy p,.newsletter p,.page-kicker p,.finder-intro p,.account-card p,.contact-intro > p { font-size:17px; }
+.rating,.product-foot,.catalog-search input,.product-tag,.category-content small,.article-card-copy p,.search-products small,.selected-option,.modal-notes,.delivery-progress > div:first-child,.drawer-total > small,.checkout-step p,.checkout-step small { font-size:12px; }
+.blog-section { border-top:1px solid var(--line); border-bottom:1px solid var(--line); }
+.blog-intro { color:var(--muted); max-width:620px; margin:-14px 0 36px; }
+.blog-grid { display:grid; grid-template-columns:1.14fr .93fr .93fr; gap:14px; }
+.blog-card { display:flex; flex-direction:column; text-align:left; background:#eee7df; border:1px solid var(--line); padding:0; min-width:0; transition:transform .25s ease, box-shadow .25s ease; }
+.blog-card:hover { transform:translateY(-4px); box-shadow:0 12px 30px rgba(55,42,32,.1); }
+.blog-card img { width:100%; height:205px; object-fit:cover; filter:saturate(.7); }
+.blog-card-0 img { height:300px; }
+.blog-card-copy { display:flex; flex:1; flex-direction:column; align-items:flex-start; gap:11px; padding:22px; }
+.blog-card-copy h3 { margin:0; font-size:24px; line-height:1.15; }
+.blog-card-copy p { margin:0; color:var(--muted); font-size:14px; line-height:1.65; }
+.blog-card-link { display:flex; align-items:center; gap:8px; margin-top:auto; padding-top:10px; color:var(--gold); font-size:11px; font-weight:700; letter-spacing:.11em; text-transform:uppercase; }
+.socials a { width:35px; height:35px; }
+.whatsapp-float span { width:27px; height:27px; }
+.whatsapp-float small { font-size:12px; }
+
+@media (max-width: 900px) {
+  .blog-grid { grid-template-columns:1fr 1fr; }
+  .blog-card-0 { grid-column:1 / -1; }
+  .blog-card-0 img { height:250px; }
+}
+@media (max-width: 520px) {
+  body { font-size:15px; }
+  p { font-size:15px; }
+  .hero-copy > p,.routine-copy p,.edit-copy p,.store-copy p,.newsletter p,.page-kicker p,.finder-intro p,.account-card p,.contact-intro > p { font-size:16px; }
+  .blog-grid { grid-template-columns:1fr; }
+  .blog-card-0 { grid-column:auto; }
+  .blog-card img,.blog-card-0 img { height:220px; }
+  .blog-card-copy h3 { font-size:22px; }
+}
