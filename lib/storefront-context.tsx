@@ -1,0 +1,46 @@
+"use client";
+
+import { createContext, useContext, useMemo, useState } from "react";
+import type { Product } from "./store-data";
+
+export type CartLine = { product: Product; quantity: number; option?: string };
+
+type StorefrontContextValue = {
+  cart: CartLine[];
+  wishlist: Product[];
+  cartCount: number;
+  cartTotal: number;
+  addToCart: (product: Product, option?: string) => void;
+  removeFromCart: (productId: string, option?: string) => void;
+  changeQuantity: (productId: string, delta: number, option?: string) => void;
+  toggleWishlist: (product: Product) => void;
+};
+
+const StorefrontContext = createContext<StorefrontContextValue | null>(null);
+
+export function StorefrontProvider({ children }: { children: React.ReactNode }) {
+  const [cart, setCart] = useState<CartLine[]>([]);
+  const [wishlist, setWishlist] = useState<Product[]>([]);
+
+  const value = useMemo(() => ({
+    cart,
+    wishlist,
+    cartCount: cart.reduce((sum, line) => sum + line.quantity, 0),
+    cartTotal: cart.reduce((sum, line) => sum + line.product.price * line.quantity, 0),
+    addToCart: (product: Product, option?: string) => setCart((current) => {
+      const existing = current.find((line) => line.product.id === product.id && line.option === option);
+      return existing ? current.map((line) => line === existing ? { ...line, quantity: line.quantity + 1 } : line) : [...current, { product, quantity: 1, option }];
+    }),
+    removeFromCart: (productId: string, option?: string) => setCart((current) => current.filter((line) => !(line.product.id === productId && line.option === option))),
+    changeQuantity: (productId: string, delta: number, option?: string) => setCart((current) => current.map((line) => line.product.id === productId && line.option === option ? { ...line, quantity: Math.max(1, line.quantity + delta) } : line)),
+    toggleWishlist: (product: Product) => setWishlist((current) => current.some((item) => item.id === product.id) ? current.filter((item) => item.id !== product.id) : [...current, product]),
+  }), [cart, wishlist]);
+
+  return <StorefrontContext.Provider value={value}>{children}</StorefrontContext.Provider>;
+}
+
+export function useStorefront() {
+  const context = useContext(StorefrontContext);
+  if (!context) throw new Error("useStorefront must be used inside StorefrontProvider");
+  return context;
+}
