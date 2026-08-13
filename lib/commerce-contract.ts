@@ -1,10 +1,6 @@
 import type { Product } from "./store-data";
 
-/**
- * The UI depends on this small commerce contract rather than directly on a
- * vendor SDK. The current demo uses the local catalogue; a Shopify adapter
- * can implement these functions with Storefront API queries and mutations.
- */
+/** Keeps product and cart code separate from the service used to power it. */
 export type CommerceCatalog = {
   listProducts: (input?: { collection?: string; query?: string; category?: string }) => Promise<Product[]>;
   getProductByHandle: (handle: string) => Promise<Product | undefined>;

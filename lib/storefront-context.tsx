@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useMemo, useState } from "react";
+import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import type { Product } from "./store-data";
 
 export type CartLine = { product: Product; quantity: number; option?: string };
@@ -21,6 +21,26 @@ const StorefrontContext = createContext<StorefrontContextValue | null>(null);
 export function StorefrontProvider({ children }: { children: React.ReactNode }) {
   const [cart, setCart] = useState<CartLine[]>([]);
   const [wishlist, setWishlist] = useState<Product[]>([]);
+  const [hydrated, setHydrated] = useState(false);
+
+  useEffect(() => {
+    try {
+      const savedCart = window.localStorage.getItem("aglory-cart");
+      const savedWishlist = window.localStorage.getItem("aglory-wishlist");
+      if (savedCart) setCart(JSON.parse(savedCart));
+      if (savedWishlist) setWishlist(JSON.parse(savedWishlist));
+    } catch {
+      // Start with an empty bag if saved data cannot be read.
+    } finally {
+      setHydrated(true);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!hydrated) return;
+    window.localStorage.setItem("aglory-cart", JSON.stringify(cart));
+    window.localStorage.setItem("aglory-wishlist", JSON.stringify(wishlist));
+  }, [cart, wishlist, hydrated]);
 
   const value = useMemo(() => ({
     cart,

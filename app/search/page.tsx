@@ -1,4 +1,3 @@
-import { ShopCatalog } from "@/components/route-ui";
-import { products } from "@/lib/store-data";
+import { SearchPage } from "@/components/route-ui";
 export const metadata = { title: "Search | Aglory Hair and Cosmetics" };
-export default function SearchRoute() { return <ShopCatalog items={products} eyebrow="Find your next essential" title={<>Search the <em>catalogue.</em></>} />; }
+export default function SearchRoute() { return <SearchPage />; }

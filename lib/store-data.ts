@@ -42,7 +42,7 @@ export const categories = [
   { slug: "wigs-extensions", name: "Wigs & extensions", note: "Your next signature style", image: image("photo-1519699047748-de8e457a634e") },
   { slug: "skin-body", name: "Skin & body", note: "Glow from the neck down", image: image("photo-1556229010-6c3f2c9ca5f8") },
   { slug: "makeup", name: "Makeup", note: "Colour with intention", image: image("photo-1596462502278-27bfdc403348") },
-  { slug: "mens-grooming", name: "Men’s grooming", note: "The daily edit", image: image("photo-1621605815971-fbc98d665033") },
+  { slug: "mens-grooming", name: "Men’s grooming", note: "Everyday care", image: image("photo-1621605815971-fbc98d665033") },
   { slug: "tools-accessories", name: "Tools & accessories", note: "Finish the look", image: image("photo-1522335789203-aabd1fc54bc9") },
 ];
 
