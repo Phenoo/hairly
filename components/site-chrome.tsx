@@ -14,7 +14,7 @@ export function SiteChrome({ children }: { children: React.ReactNode }) {
     <header className="site-header">
       <div className="header-main container">
         <button className="mobile-menu" aria-label="Open navigation" onClick={() => setMobileNav(true)}><Menu size={21} /></button>
-        <Link className="logo" href="/" aria-label="Aglory home"><span>ag</span>lory</Link>
+        <Link className="logo" href="/" aria-label="Aglory Hair and Cosmetics home"><span>ag</span>lory</Link>
         <nav className="desktop-nav" aria-label="Main navigation"><Link href="/shop">Shop</Link><Link href="/finders">Find your beauty</Link><Link href="/brands">Brands</Link><Link href="/blog">Blog</Link></nav>
         <div className="header-actions"><Link className="icon-label" href="/search"><Search size={19} /><span>Search</span></Link><Link className="icon-label hide-small" href="/account"><UserRound size={19} /><span>Account</span></Link><Link className="icon-label" href="/wishlist" aria-label="Wishlist"><Heart size={19} /><span className="hide-small">Wishlist</span>{wishlist.length > 0 && <b>{wishlist.length}</b>}</Link><Link className="bag-button" href="/cart" aria-label="Shopping bag"><ShoppingBag size={20} /><span className="bag-count">{cartCount}</span></Link></div>
       </div>

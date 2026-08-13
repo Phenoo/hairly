@@ -4,7 +4,7 @@ import { StorefrontProvider } from "@/lib/storefront-context";
 import { SiteChrome } from "@/components/site-chrome";
 
 export const metadata: Metadata = {
-  title: "Aglory Hair & Cosmetics — Beauty, made brilliantly personal.",
+  title: "Aglory Hair and Cosmetics — Beauty, made brilliantly personal.",
   description: "Discover expertly curated hair, skin and beauty essentials for every texture, tone and ritual.",
 };
 
