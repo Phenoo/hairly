@@ -1,3 +1,49 @@
 import { UtilityPage } from "@/components/route-ui";
-export const metadata = { title: "Delivery & Returns | Aglory Hair and Cosmetics" };
-export default function DeliveryReturnsRoute() { return <UtilityPage eyebrow="Help centre" title={<>Delivery & <em>returns.</em></>} body="Clear, transparent delivery information for online orders, same-day local delivery and Click & Collect."><div className="policy-grid"><section><h2>Delivery</h2><p>Delivery options and prices are shown at checkout once your address is entered. Orders for local delivery are handled by the Aglory team in Erith.</p></section><section><h2>Click & Collect</h2><p>Choose Click & Collect at checkout and we’ll confirm when your order is ready to collect from 8 Cross Street, Erith, Kent DA8 1RB.</p></section><section><h2>Returns</h2><p>Contact us within 30 days if you need to return an eligible item. Products must be unused, unopened and in their original packaging.</p></section><section><h2>Need help?</h2><p><a href="/contact">Contact the Aglory team</a> or message us on WhatsApp and we’ll help with your order.</p></section></div></UtilityPage>; }
+export const metadata = {
+  title: "Delivery & Returns | Aglory Hair and Cosmetics",
+};
+export default function DeliveryReturnsRoute() {
+  return (
+    <UtilityPage
+      eyebrow="Help centre"
+      title={
+        <>
+          Delivery & <em>returns.</em>
+        </>
+      }
+      body="Clear, transparent delivery information for online orders, same-day local delivery and Click & Collect."
+    >
+      <div className="policy-grid">
+        <section>
+          <h2>Delivery</h2>
+          <p>
+            Delivery options and prices are shown at checkout once your address
+            is entered. Orders for local delivery are handled by the Aglory team
+            in Erith.
+          </p>
+        </section>
+        <section>
+          <h2>Click & Collect</h2>
+          <p>
+            Choose Click & Collect at checkout and we’ll confirm when your order
+            is ready to collect from 8 Cross Street, Erith, Kent DA8 1RB.
+          </p>
+        </section>
+        <section>
+          <h2>Returns</h2>
+          <p>
+            Contact us within 30 days if you need to return an eligible item.
+            Products must be unused, unopened and in their original packaging.
+          </p>
+        </section>
+        <section>
+          <h2>Need help?</h2>
+          <p>
+            <a href="/contact">Contact the Aglory team</a> or message us on
+            WhatsApp and we’ll help with your order.
+          </p>
+        </section>
+      </div>
+    </UtilityPage>
+  );
+}

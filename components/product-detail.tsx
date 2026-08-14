@@ -6,4 +6,139 @@ import type { Product } from "@/lib/store-data";
 import { categorySlug, money, products } from "@/lib/store-data";
 import { useStorefront } from "@/lib/storefront-context";
 import { ProductGrid } from "@/components/product-card";
-export function ProductDetail({ product }: { product: Product }) { const [option, setOption] = useState(""); const [added, setAdded] = useState(false); const { addToCart, wishlist, toggleWishlist } = useStorefront(); const wished = wishlist.some((item) => item.id === product.id); const addProduct = () => { addToCart(product, option || undefined); setAdded(true); }; return <section className="product-detail container section-space"><div className="product-detail-grid"><div className="product-detail-image"><img src={product.image} alt={product.imageAlt} /></div><div className="product-detail-copy"><Link className="eyebrow" href={`/category/${categorySlug(product.category)}`}>{product.category}</Link><span className="eyebrow">{product.brand}</span><h1>{product.name}</h1><div className="rating"><span className="stars">★★★★★</span> {product.rating} · {product.reviews} reviews</div><div className="detail-price">{money(product.price)} {product.compareAt && <del>{money(product.compareAt)}</del>}</div><p>{product.description}</p><span className="sku">SKU: {product.sku}</span>{product.options && <div className="detail-options"><div className="option-label"><span className="eyebrow">{product.type === "Makeup" ? "Choose your shade" : "Choose your option"}</span><strong>{option || "Select an option"}</strong></div><div className="option-grid">{product.options.map((item, index) => <button type="button" key={item} disabled={index === 6 && product.id === "black-opal"} className={`${option === item ? "selected" : ""} ${index === 6 && product.id === "black-opal" ? "sold-out" : ""}`} onClick={() => { setOption(item); setAdded(false); }}>{item}</button>)}</div></div>}<div className="detail-actions"><button className="button button-dark" disabled={Boolean(product.options && !option)} onClick={addProduct}>{added ? "Added to bag" : "Add to bag"} <ShoppingBag size={16} /></button><button className={`modal-wish ${wished ? "is-active" : ""}`} onClick={() => toggleWishlist(product)} aria-label={`${wished ? "Remove" : "Add"} ${product.name} ${wished ? "from" : "to"} wishlist`}><Heart size={18} fill={wished ? "currentColor" : "none"} /></button></div>{added && <p className="inline-success" role="status">Added to your bag. <Link href="/cart">View bag</Link></p>}<div className="modal-notes"><span><Check size={14} /> Same-day delivery available</span><span><Check size={14} /> 30-day returns</span><span><Check size={14} /> Secure checkout</span></div></div></div><div className="detail-accordions"><details open><summary>Description</summary><p>{product.description}</p></details><details><summary>Delivery & returns</summary><p>Same-day delivery is available locally when orders are placed before 12pm. Aglory offers 30-day returns on eligible items.</p></details><details><summary>Need advice?</summary><p>Our Erith store team can help you choose a shade, texture or routine. <a href="https://wa.me/4407446841404">WhatsApp the team.</a></p></details></div><section className="related-products"><div className="section-heading"><div><span className="eyebrow">Complete the routine</span><h2>You may also <em>like.</em></h2></div><Link className="text-button" href="/shop">Shop all <ArrowRight size={16} /></Link></div><ProductGrid items={products.filter((item) => item.id !== product.id).slice(0, 4)} /></section></section>; }
+export function ProductDetail({ product }: { product: Product }) {
+  const [option, setOption] = useState("");
+  const [added, setAdded] = useState(false);
+  const { addToCart, wishlist, toggleWishlist } = useStorefront();
+  const wished = wishlist.some((item) => item.id === product.id);
+  const addProduct = () => {
+    addToCart(product, option || undefined);
+    setAdded(true);
+  };
+  return (
+    <section className="product-detail container section-space">
+      <div className="product-detail-grid">
+        <div className="product-detail-image">
+          <img src={product.image} alt={product.imageAlt} />
+        </div>
+        <div className="product-detail-copy">
+          <Link
+            className="eyebrow"
+            href={`/category/${categorySlug(product.category)}`}
+          >
+            {product.category}
+          </Link>
+          <span className="eyebrow">{product.brand}</span>
+          <h1>{product.name}</h1>
+          <div className="rating">
+            <span className="stars">★★★★★</span> {product.rating} ·{" "}
+            {product.reviews} reviews
+          </div>
+          <div className="detail-price">
+            {money(product.price)}{" "}
+            {product.compareAt && <del>{money(product.compareAt)}</del>}
+          </div>
+          <p>{product.description}</p>
+          <span className="sku">SKU: {product.sku}</span>
+          {product.options && (
+            <div className="detail-options">
+              <div className="option-label">
+                <span className="eyebrow">
+                  {product.type === "Makeup"
+                    ? "Choose your shade"
+                    : "Choose your option"}
+                </span>
+                <strong>{option || "Select an option"}</strong>
+              </div>
+              <div className="option-grid">
+                {product.options.map((item, index) => (
+                  <button
+                    type="button"
+                    key={item}
+                    disabled={index === 6 && product.id === "black-opal"}
+                    className={`${option === item ? "selected" : ""} ${index === 6 && product.id === "black-opal" ? "sold-out" : ""}`}
+                    onClick={() => {
+                      setOption(item);
+                      setAdded(false);
+                    }}
+                  >
+                    {item}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+          <div className="detail-actions">
+            <button
+              className="button button-dark"
+              disabled={Boolean(product.options && !option)}
+              onClick={addProduct}
+            >
+              {added ? "Added to bag" : "Add to bag"} <ShoppingBag size={16} />
+            </button>
+            <button
+              className={`modal-wish ${wished ? "is-active" : ""}`}
+              onClick={() => toggleWishlist(product)}
+              aria-label={`${wished ? "Remove" : "Add"} ${product.name} ${wished ? "from" : "to"} wishlist`}
+            >
+              <Heart size={18} fill={wished ? "currentColor" : "none"} />
+            </button>
+          </div>
+          {added && (
+            <p className="inline-success" role="status">
+              Added to your bag. <Link href="/cart">View bag</Link>
+            </p>
+          )}
+          <div className="modal-notes">
+            <span>
+              <Check size={14} /> Same-day delivery available
+            </span>
+            <span>
+              <Check size={14} /> 30-day returns
+            </span>
+            <span>
+              <Check size={14} /> Secure checkout
+            </span>
+          </div>
+        </div>
+      </div>
+      <div className="detail-accordions">
+        <details open>
+          <summary>Description</summary>
+          <p>{product.description}</p>
+        </details>
+        <details>
+          <summary>Delivery & returns</summary>
+          <p>
+            Same-day delivery is available locally when orders are placed before
+            12pm. Aglory offers 30-day returns on eligible items.
+          </p>
+        </details>
+        <details>
+          <summary>Need advice?</summary>
+          <p>
+            Our Erith store team can help you choose a shade, texture or
+            routine.{" "}
+            <a href="https://wa.me/4407446841404">WhatsApp the team.</a>
+          </p>
+        </details>
+      </div>
+      <section className="related-products">
+        <div className="section-heading">
+          <div>
+            <span className="eyebrow">Complete the routine</span>
+            <h2>
+              You may also <em>like.</em>
+            </h2>
+          </div>
+          <Link className="text-button" href="/shop">
+            Shop all <ArrowRight size={16} />
+          </Link>
+        </div>
+        <ProductGrid
+          items={products.filter((item) => item.id !== product.id).slice(0, 4)}
+        />
+      </section>
+    </section>
+  );
+}
