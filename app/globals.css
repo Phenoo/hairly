@@ -18,13 +18,15 @@
 }
 
 :root {
-  --ink: #12395b;
+  --blue: #0f1c49;
+  --ink: var(--blue);
   --muted: #627486;
   --cream: #edf5fb;
   --paper: #ffffff;
   --line: #d8e4ef;
   --gold: #b4865c;
-  --dark: #0d2d4b;
+  --dark: var(--blue);
+  --announcement-height: 33px;
   --serif: "Playfair Display", Georgia, serif;
   --sans: "Satoshi Local", Arial, sans-serif;
 }
@@ -3195,6 +3197,46 @@ em {
 
   .auth-intro h1 {
     font-size: 58px;
+  }
+}
+
+/* Scroll-aware fixed navigation */
+.site-header-spacer {
+  height: 76px;
+}
+
+.site-header {
+  background: rgba(255, 255, 255, 0.97);
+  left: 0;
+  position: fixed;
+  right: 0;
+  top: var(--announcement-height);
+  transform: translateY(0);
+  transition: transform 0.24s ease, top 0.24s ease;
+  z-index: 50;
+}
+
+.site-header.is-scrolled {
+  top: 0;
+}
+
+.site-header.is-hidden {
+  transform: translateY(-110%);
+}
+
+@media (max-width: 900px) {
+  :root {
+    --announcement-height: 31px;
+  }
+
+  .site-header-spacer {
+    height: 65px;
+  }
+}
+
+@media (max-width: 600px) {
+  .site-header-spacer {
+    height: 62px;
   }
 }
 

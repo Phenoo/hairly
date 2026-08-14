@@ -34,8 +34,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     openingHours: ["Mo-Sa 09:00-19:00", "Su 11:00-16:00"],
   };
   return (
-    <html lang="en" className="h-full antialiased" data-scroll-behavior="smooth">
-      <body className="min-h-full flex flex-col" suppressHydrationWarning>
+    <html lang="en" className="h-full antialiased" data-scroll-behavior="smooth"
+    >
+      <body className="min-h-full flex flex-col">
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(localBusinessSchema) }}
