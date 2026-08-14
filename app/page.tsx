@@ -35,24 +35,6 @@ const blogCards = [
   ],
 ];
 
-const testimonials = [
-  [
-    "The Keratin Treatment transformed my frizzy hair into silky smooth locks. I can't believe the difference it made in just one use!",
-    "Sarah Johnson",
-    "Professional Stylist",
-  ],
-  [
-    "Fast delivery and premium packaging. The Argan Oil feels so light on my skin and has a wonderful subtle scent.",
-    "Emma Williams",
-    "Verified Buyer",
-  ],
-  [
-    "Aglory is my go-to for all things beauty. Their customer service is exceptional, and the product quality is consistent.",
-    "David Chen",
-    "Beauty Enthusiast",
-  ],
-];
-
 const featuredBrands = [
   { name: "Sensationnel", domain: "sensationnel.com" },
   { name: "Shea Moisture", domain: "www.sheamoisture.com" },
@@ -71,7 +53,7 @@ const signatureEdits = [
       </>
     ),
     body: "Braids, twists and extensions chosen for the way you actually wear them.",
-    href: "/category/wigs-extensions",
+    href: "/collections/protective-styling",
     image: products[1].image,
     alt: products[1].imageAlt,
   },
@@ -83,19 +65,19 @@ const signatureEdits = [
       </>
     ),
     body: "Everyday essentials for softer strands, nourished roots and polished finishes.",
-    href: "/category/hair-care",
+    href: "/collections/wash-day",
     image: products[2].image,
     alt: products[2].imageAlt,
   },
   {
-    eyebrow: "Colour with intention",
+    eyebrow: "Wig care",
     title: (
       <>
-        Find your <em>right match.</em>
+        Keep your <em>style in form.</em>
       </>
     ),
-    body: "Complexion and beauty staples made easier to explore by tone, texture and finish.",
-    href: "/category/makeup",
+    body: "Simple care essentials for a polished routine between wears.",
+    href: "/collections/wig-care",
     image: products[0].image,
     alt: products[0].imageAlt,
   },
@@ -123,9 +105,14 @@ export default function HomePage() {
             <Link className="button button-dark" href="/shop">
               Shop beauty <ArrowRight size={16} />
             </Link>
-            <Link className="text-button" href="/shop">
-              Explore categories <ArrowUpRight size={16} />
+            <Link className="text-button" href="/category/wigs-extensions">
+              Shop wigs & extensions <ArrowUpRight size={16} />
             </Link>
+          </div>
+          <div className="hero-category-links" aria-label="Shop key categories">
+            <Link href="/category/hair-care">Shop hair</Link>
+            <Link href="/category/wigs-extensions">Shop wigs</Link>
+            <Link href="/category/skin-body">Shop skincare</Link>
           </div>
         </div>
 
@@ -184,8 +171,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      <BrandMarquee />
-
       <section className="category-section container section-space">
         <div className="section-heading">
           <div>
@@ -219,6 +204,8 @@ export default function HomePage() {
           ))}
         </div>
       </section>
+
+      <BrandMarquee />
 
       <section className="brand-ribbon">
         <div className="container">
@@ -388,25 +375,30 @@ export default function HomePage() {
             <div>
               <span className="eyebrow">Customer stories</span>
               <h2>
-                Loved by
+                Loved by the
                 <br />
-                <em>beauty lovers.</em>
+                <em>community.</em>
               </h2>
             </div>
-            <span className="testimonial-note">
-              Don’t just take our word for it.
-            </span>
+            <span className="testimonial-note">Stories published by Aglory.</span>
           </div>
-          <div className="testimonial-grid">
-            {testimonials.map(([quote, name, role]) => (
-              <article className="testimonial-card" key={name}>
-                <span className="stars">★★★★★</span>
-                <blockquote>“{quote}”</blockquote>
-                <strong>{name}</strong>
-                <small>{role}</small>
+          <div className="review-placeholder-grid">
+            {[
+              ["Sarah Johnson", "Professional Stylist", "The Keratin Treatment transformed my frizzy hair..."],
+              ["Emma Williams", "Customer story", "Fast delivery and premium packaging."],
+              ["David Chen", "Beauty Enthusiast", "Aglory is my go-to for all things beauty."],
+            ].map(([author, role, quote]) => (
+              <article className="review-placeholder-card review-testimonial-card" key={author}>
+                <span className="review-placeholder-mark">“</span>
+                <blockquote>{quote}</blockquote>
+                <h3>{author}</h3>
+                <p>{role}</p>
               </article>
             ))}
           </div>
+          <a className="text-button review-contact-link" href="https://www.agloryhairandcosmetics.co.uk/" target="_blank" rel="noreferrer">
+            View more stories <ArrowRight size={16} />
+          </a>
         </div>
       </section>
 
@@ -457,9 +449,14 @@ export default function HomePage() {
             </span>
           </div>
           <div className="store-links">
-            <Link className="button button-outline" href="/contact">
+            <a
+              className="button button-outline"
+              href="https://www.google.com/maps/search/?api=1&query=8+Cross+Street+Erith+Kent+DA8+1RB"
+              target="_blank"
+              rel="noreferrer"
+            >
               Get directions <ArrowUpRight size={15} />
-            </Link>
+            </a>
             <a
               href="https://wa.me/4407446841404"
               target="_blank"

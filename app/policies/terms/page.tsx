@@ -24,9 +24,8 @@ export default function TermsRoute() {
         <section>
           <h2>Orders</h2>
           <p>
-            An order is confirmed once the live store accepts it. This prototype
-            only demonstrates the checkout journey and does not create a paid
-            order.
+            An order is confirmed once the live store accepts it. Online payment
+            and order confirmation will be completed through Shopify Checkout.
           </p>
         </section>
         <section>

@@ -18,6 +18,7 @@ import type { Product } from "@/lib/store-data";
 import {
   brands,
   blogPosts,
+  categories,
   image,
   money,
   products,
@@ -62,6 +63,10 @@ export function ShopCatalog({
   const activeCategory = searchParams.get("category") || "";
   const activeCollection = searchParams.get("collection") || "";
   const [sort, setSort] = useState("featured");
+  const [brandFilter, setBrandFilter] = useState("all");
+  const [priceFilter, setPriceFilter] = useState("all");
+  const [availabilityFilter, setAvailabilityFilter] = useState("all");
+  const [optionFilter, setOptionFilter] = useState("all");
   const filterTypes: Record<string, Product["type"][]> = {
     "Hair care": ["Hair"],
     "Wigs & extensions": ["Wigs"],
@@ -82,17 +87,34 @@ export function ShopCatalog({
         : activeCollection === "best-sellers"
           ? ["Bestseller", "Top rated"].includes(product.tag || "")
           : true);
-    return categoryMatches && collectionMatches;
+    const brandMatches = brandFilter === "all" || product.brand === brandFilter;
+    const priceMatches =
+      priceFilter === "all" ||
+      (priceFilter === "under-10" && product.price < 10) ||
+      (priceFilter === "10-25" && product.price >= 10 && product.price <= 25) ||
+      (priceFilter === "over-25" && product.price > 25);
+    const availabilityMatches =
+      availabilityFilter === "all" ||
+      (availabilityFilter === "in-stock" && product.inventory > 0) ||
+      (availabilityFilter === "low-stock" && product.inventory > 0 && product.inventory <= 5);
+    const optionMatches =
+      optionFilter === "all" || Boolean(product.options?.includes(optionFilter));
+    return categoryMatches && collectionMatches && brandMatches && priceMatches && availabilityMatches && optionMatches;
   });
   const visibleItems = [...filtered].sort((a, b) =>
     sort === "price-low"
       ? a.price - b.price
       : sort === "price-high"
         ? b.price - a.price
-        : sort === "rating"
-          ? b.rating - a.rating
+        : sort === "best-selling"
+          ? Number(Boolean(b.tag && ["Bestseller", "Top rated"].includes(b.tag))) - Number(Boolean(a.tag && ["Bestseller", "Top rated"].includes(a.tag)))
+        : sort === "newest"
+          ? Number(Boolean(b.tag && ["New", "New arrival", "Just in"].includes(b.tag))) - Number(Boolean(a.tag && ["New", "New arrival", "Just in"].includes(a.tag)))
           : 0,
   );
+  const filterBrands = [...new Set(items.map((product) => product.brand))].sort();
+  const filterOptions = [...new Set(items.flatMap((product) => product.options || []))].sort();
+  const hasExtraFilters = [brandFilter, priceFilter, availabilityFilter, optionFilter].some((value) => value !== "all");
   const filterUrl = (filter: string) =>
     filter === "All products"
       ? "/shop"
@@ -140,6 +162,55 @@ export function ShopCatalog({
           <span>Search products</span>
         </Link>
       </div>
+      <details className="catalog-filter-drawer">
+        <summary>
+          <span>Filter products{hasExtraFilters ? " · Applied" : ""}</span>
+          <ChevronDown size={16} />
+        </summary>
+        <div className="catalog-filter-grid">
+          <label>
+            <span>Brand</span>
+            <select value={brandFilter} onChange={(event) => setBrandFilter(event.target.value)}>
+              <option value="all">All brands</option>
+              {filterBrands.map((brand) => <option value={brand} key={brand}>{brand}</option>)}
+            </select>
+          </label>
+          <label>
+            <span>Price</span>
+            <select value={priceFilter} onChange={(event) => setPriceFilter(event.target.value)}>
+              <option value="all">Any price</option>
+              <option value="under-10">Under £10</option>
+              <option value="10-25">£10–£25</option>
+              <option value="over-25">Over £25</option>
+            </select>
+          </label>
+          <label>
+            <span>Availability</span>
+            <select value={availabilityFilter} onChange={(event) => setAvailabilityFilter(event.target.value)}>
+              <option value="all">All products</option>
+              <option value="in-stock">In stock</option>
+              <option value="low-stock">Low stock</option>
+            </select>
+          </label>
+          {filterOptions.length > 0 && (
+            <label>
+              <span>Colour / length</span>
+              <select value={optionFilter} onChange={(event) => setOptionFilter(event.target.value)}>
+                <option value="all">Any option</option>
+                {filterOptions.map((option) => <option value={option} key={option}>{option}</option>)}
+              </select>
+            </label>
+          )}
+          {hasExtraFilters && (
+            <button type="button" className="filter-clear" onClick={() => {
+              setBrandFilter("all");
+              setPriceFilter("all");
+              setAvailabilityFilter("all");
+              setOptionFilter("all");
+            }}>Clear filters</button>
+          )}
+        </div>
+      </details>
       <div className="shop-meta">
         <span>
           {visibleItems.length} result{visibleItems.length === 1 ? "" : "s"}
@@ -155,7 +226,8 @@ export function ShopCatalog({
             onChange={(event) => setSort(event.target.value)}
           >
             <option value="featured">Featured</option>
-            <option value="rating">Top rated</option>
+            <option value="best-selling">Best selling</option>
+            <option value="newest">Newest</option>
             <option value="price-low">Price: low to high</option>
             <option value="price-high">Price: high to low</option>
           </select>
@@ -355,7 +427,7 @@ export function FinderPage({ kind }: { kind: "hair" | "beauty" }) {
               <>
                 <p className="finder-selection">
                   You chose <strong>{selection}</strong>. We’ve matched the
-                  closest products from this this catalogue.
+                  closest products from this catalogue.
                 </p>
                 <button
                   type="button"
@@ -569,9 +641,23 @@ export function ContactPage() {
             <span>WhatsApp us</span>
             <strong>+44 07446 841404</strong>
           </a>
-          <a href="mailto:info@agloryhairandcosmetics.co.uk">
+          <a href="mailto:agloryltd@aol.com">
             <span>Email</span>
-            <strong>info@agloryhairandcosmetics.co.uk</strong>
+            <strong>agloryltd@aol.com</strong>
+          </a>
+        </div>
+        <div className="contact-store-card">
+          <span className="eyebrow">Visit the store</span>
+          <strong>Aglory Hair and Cosmetics</strong>
+          <p>8 Cross Street, Erith, Kent DA8 1RB</p>
+          <p>Mon–Sat 9am–7pm · Sun 11am–4pm</p>
+          <a
+            className="text-button"
+            href="https://www.google.com/maps/search/?api=1&query=8+Cross+Street+Erith+Kent+DA8+1RB"
+            target="_blank"
+            rel="noreferrer"
+          >
+            Get directions <ArrowRight size={15} />
           </a>
         </div>
       </div>
@@ -582,9 +668,8 @@ export function ContactPage() {
             <Check size={25} />
             <h2>Message received.</h2>
             <p>
-              Thanks for getting in touch. This prototype has recorded your
-              message and the Aglory team can follow up here once the inbox is
-              connected.
+              Thanks for getting in touch. Your message is ready to be connected
+              to the Aglory inbox.
             </p>
             <button
               className="button button-outline"
@@ -788,6 +873,14 @@ export function WishlistPage() {
 
 export function SearchPage() {
   const [query, setQuery] = useState("");
+  const [recentSearches, setRecentSearches] = useState<string[]>(() => {
+    if (typeof window === "undefined") return [];
+    try {
+      return JSON.parse(window.localStorage.getItem("aglory-recent-searches") || "[]");
+    } catch {
+      return [];
+    }
+  });
   const normalized = query.trim().toLowerCase();
   const searchable = (product: Product) =>
     `${product.brand} ${product.name} ${product.category} ${product.type} ${product.description}`.toLowerCase();
@@ -801,6 +894,20 @@ export function SearchPage() {
         )
         .slice(0, 4)
     : [];
+  const liveResults = normalized ? results.slice(0, 4) : [];
+  const matchingCategories = normalized
+    ? categories.filter((category) => `${category.name} ${category.note}`.toLowerCase().includes(normalized)).slice(0, 3)
+    : [];
+  const matchingBrands = normalized
+    ? brands.filter((brand) => brand.toLowerCase().includes(normalized)).slice(0, 3)
+    : [];
+  const popularSearches = ["Shea Moisture", "foundation", "hair care", "wigs"];
+  const chooseSearch = (term: string) => {
+    setQuery(term);
+    const next = [term, ...recentSearches.filter((item) => item.toLowerCase() !== term.toLowerCase())].slice(0, 5);
+    setRecentSearches(next);
+    window.localStorage.setItem("aglory-recent-searches", JSON.stringify(next));
+  };
   return (
     <section className="route-page container section-space">
       <RouteIntro
@@ -817,18 +924,71 @@ export function SearchPage() {
         <input
           autoFocus
           value={query}
-          onChange={(event) => setQuery(event.target.value)}
+            onChange={(event) => setQuery(event.target.value)}
+          onKeyDown={(event) => {
+            if (event.key === "Enter" && query.trim()) chooseSearch(query.trim());
+          }}
           placeholder="Try “Shea Moisture”, “foundation” or “hair”"
           aria-label="Search products"
         />
       </label>
+      {!normalized && (
+        <div className="search-discovery">
+          {recentSearches.length > 0 && (
+            <>
+              <span className="eyebrow">Recent searches</span>
+              <div className="search-chips">
+                {recentSearches.map((term) => (
+                  <button type="button" key={term} onClick={() => setQuery(term)}>{term}</button>
+                ))}
+              </div>
+            </>
+          )}
+          <span className="eyebrow">Popular searches</span>
+          <div className="search-chips">
+            {popularSearches.map((term) => (
+              <button type="button" key={term} onClick={() => setQuery(term)}>
+                {term}
+              </button>
+            ))}
+          </div>
+          <span className="eyebrow">Browse by category</span>
+          <div className="search-category-links">
+            {categories.slice(0, 4).map((category) => (
+              <Link href={`/category/${category.slug}`} key={category.slug}>
+                {category.name} <ArrowRight size={14} />
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
+      {normalized && (liveResults.length > 0 || matchingCategories.length > 0 || matchingBrands.length > 0) && (
+        <div className="search-live-panel" aria-label="Search suggestions">
+          {liveResults.length > 0 && (
+            <div className="search-live-products">
+              <span className="eyebrow">Products</span>
+              {liveResults.map((product) => (
+                <Link href={`/products/${product.slug}`} key={product.id}>
+                  <img src={product.image} alt="" />
+                  <span><small>{product.brand}</small>{product.name}</span>
+                  <strong>{money(product.price)}</strong>
+                </Link>
+              ))}
+            </div>
+          )}
+          {(matchingCategories.length > 0 || matchingBrands.length > 0) && (
+            <div className="search-live-links">
+              {matchingCategories.map((category) => <Link href={`/category/${category.slug}`} key={category.slug}>Category · {category.name}<ArrowRight size={14} /></Link>)}
+              {matchingBrands.map((brand) => <Link href={`/brands/${slugify(brand)}`} key={brand}>Brand · {brand}<ArrowRight size={14} /></Link>)}
+            </div>
+          )}
+        </div>
+      )}
       {suggestions.length > 0 && normalized && results.length === 0 && (
         <div className="search-suggestions" aria-label="Suggested products">
           {suggestions.map((product) => (
             <Link href={`/products/${product.slug}`} key={product.id}>
-              <span>{product.brand}</span>
-              {product.name}
-              <ArrowRight size={14} />
+              <span>{product.brand}</span>{product.name}<ArrowRight size={14} />
             </Link>
           ))}
         </div>
@@ -863,16 +1023,18 @@ export function CheckoutPage() {
   const { cart, cartTotal } = useStorefront();
   const [complete, setComplete] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState("card");
+  const [postcode, setPostcode] = useState("");
+  const [postcodeMessage, setPostcodeMessage] = useState("");
   if (complete)
     return (
       <section className="utility-page container section-space">
         <div className="utility-card">
           <Check size={28} />
-          <span className="eyebrow">Prototype confirmation</span>
-          <h2>Your demo order is ready.</h2>
+          <span className="eyebrow">Order details ready</span>
+          <h2>Your order is ready for checkout.</h2>
           <p>
-            No payment was taken. The selected payment method and delivery
-            details are ready for Shopify Checkout integration.
+            Payment isn’t charged in this preview. Your selected payment method
+            and delivery details are ready for Shopify Checkout.
           </p>
           <div className="utility-actions">
             <Link className="button button-dark" href="/shop">
@@ -909,13 +1071,13 @@ export function CheckoutPage() {
   return (
     <section className="checkout-page container section-space">
       <RouteIntro
-        eyebrow="Demo checkout"
+        eyebrow="Secure checkout"
         title={
           <>
             Complete your <em>order.</em>
           </>
         }
-        body="Enter your details and choose how you’d like to receive your order. Payment is simulated until the live checkout is connected."
+        body="Enter your details and choose how you’d like to receive your order. Payment activation will be completed with Shopify Checkout."
       />
       <form
         className="checkout-form"
@@ -926,6 +1088,33 @@ export function CheckoutPage() {
       >
         <div className="checkout-fields">
           <h2>Delivery details</h2>
+          <div className="postcode-checker">
+            <div>
+              <span className="eyebrow">Delivery check</span>
+              <strong>Check your postcode</strong>
+              <p>We’ll confirm delivery eligibility and the fee before payment.</p>
+            </div>
+            <div className="postcode-checker-controls">
+              <input
+                value={postcode}
+                onChange={(event) => setPostcode(event.target.value.toUpperCase())}
+                placeholder="e.g. DA8 1RB"
+                aria-label="Postcode for delivery check"
+                autoComplete="postal-code"
+              />
+              <button
+                type="button"
+                className="button button-outline"
+                onClick={() => {
+                  const valid = /^[A-Z]{1,2}\d[A-Z\d]?\s?\d[A-Z]{2}$/i.test(postcode.trim());
+                  setPostcodeMessage(valid ? "Postcode format recognised. Final eligibility and price will be confirmed before payment." : "Enter a valid UK postcode to continue.");
+                }}
+              >
+                Check
+              </button>
+            </div>
+            {postcodeMessage && <p className="postcode-message" role="status">{postcodeMessage}</p>}
+          </div>
           <input
             required
             placeholder="Full name"
@@ -963,11 +1152,11 @@ export function CheckoutPage() {
           <h2>Delivery option</h2>
           <label className="delivery-choice">
             <input type="radio" name="delivery" defaultChecked /> Standard
-            delivery <span>Delivery price will be connected at checkout</span>
+            delivery <span>Timing and fee confirmed before payment</span>
           </label>
           <label className="delivery-choice">
             <input type="radio" name="delivery" /> Click & Collect{" "}
-            <span>8 Cross Street, Erith</span>
+            <span>Collect from 8 Cross Street, Erith — availability confirmed with your order</span>
           </label>
           <h2>Payment method</h2>
           <div className="checkout-payment" aria-label="Payment method">
@@ -981,7 +1170,7 @@ export function CheckoutPage() {
                 <b>stripe</b> <strong>link</strong>
               </span>
               <i>|</i>
-              <strong>Demo</strong>
+              <strong>Secure</strong>
             </button>
             <button
               type="button"
@@ -991,7 +1180,7 @@ export function CheckoutPage() {
             >
               <strong>G Pay</strong>
               <i>|</i>
-              <span>Demo</span>
+              <span>Secure</span>
             </button>
             <button
               type="button"
@@ -1000,7 +1189,7 @@ export function CheckoutPage() {
               aria-pressed={paymentMethod === "paypal"}
             >
               <strong>PayPal</strong>
-              <span>Demo</span>
+              <span>Secure</span>
             </button>
             <button
               type="button"
@@ -1010,11 +1199,11 @@ export function CheckoutPage() {
             >
               <LockKeyhole size={25} />
               <strong>Debit or Credit Card</strong>
-              <span className="payment-demo-label">Demo</span>
+              <span className="payment-demo-label">Secure</span>
             </button>
           </div>
           <button className="button button-dark" type="submit">
-            Complete demo order <ArrowRight size={16} />
+            Review order <ArrowRight size={16} />
           </button>
         </div>
         <aside className="checkout-order">
@@ -1035,7 +1224,7 @@ export function CheckoutPage() {
             <strong>{money(cartTotal)}</strong>
           </div>
           <small className="checkout-demo-note">
-            Delivery and payment are not charged in this prototype.
+            Delivery and payment are finalised by Shopify Checkout.
           </small>
         </aside>
       </form>
@@ -1061,11 +1250,11 @@ export function TrackingPage() {
       {submitted ? (
         <div className="utility-card">
           <Check size={28} />
-          <span className="eyebrow">Demo tracking</span>
+          <span className="eyebrow">Order tracking</span>
           <h2>Details received.</h2>
           <p>
-            This demo has accepted your order details. Live delivery updates
-            will appear here when orders are connected.
+            Your tracking request is ready. Live delivery updates will appear
+            here when orders are connected.
           </p>
           <Link className="button button-dark" href="/shop">
             Continue shopping <ArrowRight size={16} />

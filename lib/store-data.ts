@@ -11,13 +11,14 @@ export type Product = {
   type: ProductType;
   image: string;
   imageAlt: string;
-  rating: number;
-  reviews: number;
   tag?: string;
   description: string;
   options?: string[];
   inventory: number;
   sku: string;
+  details?: { label: string; value: string }[];
+  howToUse?: string;
+  ingredients?: string;
 };
 
 export const image = (id: string, width = 900) =>
@@ -44,13 +45,17 @@ export const products: Product[] = [
     type: "Makeup",
     image: image("photo-1596462502278-27bfdc403348"),
     imageAlt: "Black Opal makeup collection",
-    rating: 4.5,
-    reviews: 24,
     tag: "Shade range",
     inventory: 8,
     sku: "027811037926",
     description:
       "Maximum coverage with a soft matte finish, created for normal to dry skin and a broad spectrum of deeper tones.",
+    details: [
+      { label: "Finish", value: "Soft matte" },
+      { label: "Coverage", value: "Buildable" },
+      { label: "Skin type", value: "Normal to dry" },
+    ],
+    howToUse: "Apply from the centre of the face and blend outwards. Build coverage where you need it.",
     options: [
       "Cool Nude",
       "Champagne Beige",
@@ -85,13 +90,16 @@ export const products: Product[] = [
     type: "Wigs",
     image: image("photo-1522337360788-8b13dee7a37e"),
     imageAlt: "Textured hair styling",
-    rating: 4.5,
-    reviews: 18,
     tag: "Bestseller",
     inventory: 22,
     sku: "AG-DARLING-PT",
     description:
       "Pre-looped passion twist hair for a confident protective style with a soft, natural finish.",
+    details: [
+      { label: "Material", value: "Synthetic fibre" },
+      { label: "Style", value: "Pre-looped passion twist" },
+      { label: "Care", value: "Keep dry and store away from direct heat" },
+    ],
     options: ["1B", "2", "4", "27", "30"],
   },
   {
@@ -104,13 +112,13 @@ export const products: Product[] = [
     type: "Hair",
     image: image("photo-1608248543803-ba4f8c70ae0b"),
     imageAlt: "Hair and body care products",
-    rating: 4.5,
-    reviews: 41,
     tag: "Everyday essential",
     inventory: 64,
     sku: "AG-VHF-001",
     description:
       "A classic scalp care essential for nourished roots and a healthy-looking hair routine.",
+    details: [{ label: "Routine", value: "Scalp care" }],
+    howToUse: "Apply a small amount to the scalp and massage gently. Follow the product packaging for full guidance.",
   },
   {
     id: "feme-brazilian",
@@ -123,13 +131,16 @@ export const products: Product[] = [
     type: "Wigs",
     image: image("photo-1529139574466-a303027c1d8b"),
     imageAlt: "Editorial hair texture",
-    rating: 4.8,
-    reviews: 12,
     tag: "-18%",
     inventory: 5,
     sku: "AG-FEME-BRZ",
     description:
       "Versatile 100% virgin Brazilian hair with a silky straight texture and natural movement.",
+    details: [
+      { label: "Material", value: "100% virgin Brazilian hair" },
+      { label: "Texture", value: "Straight" },
+      { label: "Care", value: "Use gentle heat and store clean and dry" },
+    ],
     options: ["10 inch", "12 inch", "14 inch", "16 inch"],
   },
   {
@@ -142,8 +153,6 @@ export const products: Product[] = [
     type: "Wigs",
     image: image("photo-1519699047748-de8e457a634e"),
     imageAlt: "Braided hair texture",
-    rating: 4.6,
-    reviews: 9,
     tag: "New",
     inventory: 31,
     sku: "AG-SNS-AFRO",
@@ -161,8 +170,6 @@ export const products: Product[] = [
     type: "Hair",
     image: image("photo-1556229010-6c3f2c9ca5f8"),
     imageAlt: "Hair serum and skincare bottles",
-    rating: 4.7,
-    reviews: 16,
     tag: "Shine ritual",
     inventory: 13,
     sku: "AG-DEXE-SERUM",
@@ -179,8 +186,6 @@ export const products: Product[] = [
     type: "Hair",
     image: image("photo-1608248543803-ba4f8c70ae0b"),
     imageAlt: "Deep treatment hair care",
-    rating: 4.6,
-    reviews: 14,
     tag: "Repair",
     inventory: 17,
     sku: "AG-DEXE-MASK",
@@ -197,8 +202,6 @@ export const products: Product[] = [
     type: "Skin",
     image: image("photo-1556228720-195a672e8a03"),
     imageAlt: "Body wash and skincare products",
-    rating: 4.7,
-    reviews: 28,
     tag: "New arrival",
     inventory: 26,
     sku: "AG-SM-FOAM",
@@ -215,8 +218,6 @@ export const products: Product[] = [
     type: "Tools",
     image: image("photo-1522335789203-aabd1fc54bc9"),
     imageAlt: "Beauty tools and accessories",
-    rating: 4.5,
-    reviews: 8,
     tag: "Just in",
     inventory: 7,
     sku: "AG-TOPPIK-KIT",
@@ -233,8 +234,6 @@ export const products: Product[] = [
     type: "Skin",
     image: image("photo-1570194065650-d99fb4ee38df"),
     imageAlt: "Rose body scrub",
-    rating: 4.9,
-    reviews: 32,
     tag: "Top rated",
     inventory: 11,
     sku: "AG-TREEHUT-ROSE",
@@ -251,8 +250,6 @@ export const products: Product[] = [
     type: "Men",
     image: image("photo-1621605815971-fbc98d665033"),
     imageAlt: "Men's grooming products",
-    rating: 4.4,
-    reviews: 7,
     tag: "Grooming",
     inventory: 18,
     sku: "AG-BIGEN-BLK",
@@ -313,6 +310,27 @@ export const brands = [
   "Sleek Makeup",
   "Cantu",
   "Freetress Equal",
+];
+
+export const collections = [
+  {
+    slug: "protective-styling",
+    name: "Protective Styling Edit",
+    description: "Braiding hair, texture and finishing essentials for your next protective style.",
+    productIds: ["darling-empress", "soft-silky"],
+  },
+  {
+    slug: "wash-day",
+    name: "Wash Day Edit",
+    description: "A considered starting point for softer strands, nourished roots and an easier wash day.",
+    productIds: ["virgin-fertilizer", "dexe-serum", "dexe-mask"],
+  },
+  {
+    slug: "wig-care",
+    name: "Wig Care Edit",
+    description: "Simple care essentials to help keep your wig routine polished between wears.",
+    productIds: ["darling-empress", "toppik"],
+  },
 ];
 
 export const blogPosts = [

@@ -33,11 +33,12 @@ export function ProductCard({ product }: { product: Product }) {
         <Link className="product-name" href={`/products/${product.slug}`}>
           {product.name}
         </Link>
-        <div className="rating">
-          <span className="stars">★★★★★</span>{" "}
-          <span>
-            {product.rating} ({product.reviews})
-          </span>
+        <div className={`stock-state ${product.inventory <= 0 ? "is-out" : product.inventory <= 5 ? "is-low" : ""}`}>
+          {product.inventory <= 0
+            ? "Out of stock"
+            : product.inventory <= 5
+              ? "Low stock"
+              : "Available now"}
         </div>
         <div className="product-foot">
           <span className="price">{money(product.price)}</span>
@@ -46,18 +47,19 @@ export function ProductCard({ product }: { product: Product }) {
           )}
           {product.options ? (
             <Link className="quick-add" href={`/products/${product.slug}`}>
-              View options
+              Choose options
             </Link>
           ) : (
             <button
               type="button"
               className="quick-add"
+              disabled={product.inventory <= 0}
               onClick={() => {
                 addToCart(product);
                 setAdded(true);
               }}
             >
-              {added ? "Added" : "Quick add"}
+              {product.inventory <= 0 ? "Unavailable" : added ? "Added" : "Add to bag"}
             </button>
           )}
         </div>

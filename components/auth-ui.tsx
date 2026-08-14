@@ -23,7 +23,7 @@ export function AuthPage({ mode }: { mode: "login" | "signup" }) {
       <section className="auth-page container section-space">
         <div className="auth-success">
           <Check size={30} />
-          <span className="eyebrow">Demo account</span>
+          <span className="eyebrow">Account preview</span>
           <h1>
             {signup ? (
               <>
@@ -40,8 +40,8 @@ export function AuthPage({ mode }: { mode: "login" | "signup" }) {
             )}
           </h1>
           <p>
-            This demo has accepted your details. Account sign-in and saved order
-            history will be connected when authentication is added.
+            Your details were accepted in this preview. Sign-in and saved order
+            history will be connected with the account service.
           </p>
           <Link className="button button-dark" href="/account">
             View your account <ArrowRight size={16} />
@@ -151,7 +151,8 @@ export function AuthPage({ mode }: { mode: "login" | "signup" }) {
             <label className="auth-check">
               <input type="checkbox" required />{" "}
               <span>
-                I agree to receive Aglory updates and accept the terms.
+                I accept the <Link href="/policies/terms">terms</Link> and
+                <Link href="/policies/privacy">privacy policy</Link>.
               </span>
             </label>
           )}

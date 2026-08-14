@@ -8,15 +8,43 @@ import { useStorefront } from "@/lib/storefront-context";
 import { ProductGrid } from "@/components/product-card";
 export function ProductDetail({ product }: { product: Product }) {
   const [option, setOption] = useState("");
+  const [quantity, setQuantity] = useState(1);
   const [added, setAdded] = useState(false);
   const { addToCart, wishlist, toggleWishlist } = useStorefront();
   const wished = wishlist.some((item) => item.id === product.id);
+  const productSchema = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: product.name,
+    brand: { "@type": "Brand", name: product.brand },
+    description: product.description,
+    image: product.image,
+    sku: product.sku,
+    offers: {
+      "@type": "Offer",
+      priceCurrency: "GBP",
+      price: product.price.toFixed(2),
+      availability: product.inventory > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
+      url: `https://www.agloryhairandcosmetics.co.uk/products/${product.slug}`,
+    },
+  };
+  const breadcrumbSchema = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: "https://www.agloryhairandcosmetics.co.uk/" },
+      { "@type": "ListItem", position: 2, name: product.category, item: `https://www.agloryhairandcosmetics.co.uk/category/${categorySlug(product.category)}` },
+      { "@type": "ListItem", position: 3, name: product.name, item: `https://www.agloryhairandcosmetics.co.uk/products/${product.slug}` },
+    ],
+  };
   const addProduct = () => {
-    addToCart(product, option || undefined);
+    addToCart(product, option || undefined, quantity);
     setAdded(true);
   };
   return (
     <section className="product-detail container section-space">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(productSchema) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
       <div className="product-detail-grid">
         <div className="product-detail-image">
           <img src={product.image} alt={product.imageAlt} />
@@ -30,9 +58,12 @@ export function ProductDetail({ product }: { product: Product }) {
           </Link>
           <span className="eyebrow">{product.brand}</span>
           <h1>{product.name}</h1>
-          <div className="rating">
-            <span className="stars">★★★★★</span> {product.rating} ·{" "}
-            {product.reviews} reviews
+          <div className={`stock-state detail-stock ${product.inventory <= 0 ? "is-out" : product.inventory <= 5 ? "is-low" : ""}`}>
+            {product.inventory <= 0
+              ? "Currently unavailable"
+              : product.inventory <= 5
+                ? `Only ${product.inventory} left`
+                : "Available now"}
           </div>
           <div className="detail-price">
             {money(product.price)}{" "}
@@ -68,10 +99,18 @@ export function ProductDetail({ product }: { product: Product }) {
               </div>
             </div>
           )}
+          <div className="quantity-row">
+            <span className="eyebrow">Quantity</span>
+            <div className="quantity-control">
+              <button type="button" onClick={() => setQuantity((value) => Math.max(1, value - 1))} aria-label="Decrease quantity">−</button>
+              <span aria-live="polite">{quantity}</span>
+              <button type="button" onClick={() => setQuantity((value) => Math.min(product.inventory, value + 1))} aria-label="Increase quantity">+</button>
+            </div>
+          </div>
           <div className="detail-actions">
             <button
               className="button button-dark"
-              disabled={Boolean(product.options && !option)}
+              disabled={product.inventory <= 0 || Boolean(product.options && !option)}
               onClick={addProduct}
             >
               {added ? "Added to bag" : "Add to bag"} <ShoppingBag size={16} />
@@ -100,6 +139,10 @@ export function ProductDetail({ product }: { product: Product }) {
               <Check size={14} /> Secure checkout
             </span>
           </div>
+          <div className="collection-note">
+            Collection from 8 Cross Street, Erith can be selected at checkout.
+            Availability is confirmed against your order.
+          </div>
         </div>
       </div>
       <div className="detail-accordions">
@@ -122,6 +165,31 @@ export function ProductDetail({ product }: { product: Product }) {
             <a href="https://wa.me/4407446841404">WhatsApp the team.</a>
           </p>
         </details>
+        {product.details?.length ? (
+          <details>
+            <summary>Product details</summary>
+            <dl className="product-facts">
+              {product.details.map((detail) => (
+                <div key={detail.label}>
+                  <dt>{detail.label}</dt>
+                  <dd>{detail.value}</dd>
+                </div>
+              ))}
+            </dl>
+          </details>
+        ) : null}
+        {product.howToUse ? (
+          <details>
+            <summary>How to use</summary>
+            <p>{product.howToUse}</p>
+          </details>
+        ) : null}
+        {product.ingredients ? (
+          <details>
+            <summary>Ingredients</summary>
+            <p>{product.ingredients}</p>
+          </details>
+        ) : null}
       </div>
       <section className="related-products">
         <div className="section-heading">
@@ -139,6 +207,18 @@ export function ProductDetail({ product }: { product: Product }) {
           items={products.filter((item) => item.id !== product.id).slice(0, 4)}
         />
       </section>
+      <div className="mobile-sticky-product-cta">
+        <span>{money(product.price)}</span>
+        <button
+          type="button"
+          className="button button-dark"
+          disabled={product.inventory <= 0 || Boolean(product.options && !option)}
+          onClick={addProduct}
+        >
+          {product.options && !option ? "Choose an option" : "Add to bag"}
+          <ShoppingBag size={15} />
+        </button>
+      </div>
     </section>
   );
 }

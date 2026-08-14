@@ -10,7 +10,7 @@ type StorefrontContextValue = {
   wishlist: Product[];
   cartCount: number;
   cartTotal: number;
-  addToCart: (product: Product, option?: string) => void;
+  addToCart: (product: Product, option?: string, quantity?: number) => void;
   removeFromCart: (productId: string, option?: string) => void;
   changeQuantity: (productId: string, delta: number, option?: string) => void;
   toggleWishlist: (product: Product) => void;
@@ -61,18 +61,20 @@ export function StorefrontProvider({
         (sum, line) => sum + line.product.price * line.quantity,
         0,
       ),
-      addToCart: (product: Product, option?: string) =>
+      addToCart: (product: Product, option?: string, quantity = 1) =>
         setCart((current) => {
+          if (product.inventory <= 0) return current;
+          const requestedQuantity = Math.max(1, Math.min(quantity, product.inventory));
           const existing = current.find(
             (line) => line.product.id === product.id && line.option === option,
           );
           return existing
             ? current.map((line) =>
                 line === existing
-                  ? { ...line, quantity: line.quantity + 1 }
+                  ? { ...line, quantity: Math.min(product.inventory, line.quantity + requestedQuantity) }
                   : line,
               )
-            : [...current, { product, quantity: 1, option }];
+            : [...current, { product, quantity: requestedQuantity, option }];
         }),
       removeFromCart: (productId: string, option?: string) =>
         setCart((current) =>
@@ -85,7 +87,7 @@ export function StorefrontProvider({
         setCart((current) =>
           current.map((line) =>
             line.product.id === productId && line.option === option
-              ? { ...line, quantity: Math.max(1, line.quantity + delta) }
+              ? { ...line, quantity: Math.min(line.product.inventory, Math.max(1, line.quantity + delta)) }
               : line,
           ),
         ),

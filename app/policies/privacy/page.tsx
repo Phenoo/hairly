@@ -33,8 +33,8 @@ export default function PrivacyRoute() {
         <section>
           <h2>Payments</h2>
           <p>
-            This prototype does not take payment. A live checkout provider will
-            process payment details when the store is connected.
+            Payment details will be processed securely by the checkout provider
+            when the online store is connected.
           </p>
         </section>
         <section>

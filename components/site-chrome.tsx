@@ -30,9 +30,69 @@ import {
   NavigationMenuTrigger,
 } from "@/components/ui/navigation-menu";
 
+const megaMenuGroups = [
+  {
+    title: "Hair",
+    links: [
+      ["Hair care", "/category/hair-care"],
+      ["Shampoo & conditioner", "/category/hair-care"],
+      ["Treatments & styling", "/category/hair-care"],
+      ["Hair colour", "/category/hair-care"],
+    ],
+  },
+  {
+    title: "Wigs & extensions",
+    links: [
+      ["Wigs", "/category/wigs-extensions"],
+      ["Braiding hair", "/category/wigs-extensions"],
+      ["Crochet & weaves", "/category/wigs-extensions"],
+      ["Hair pieces", "/category/wigs-extensions"],
+    ],
+  },
+  {
+    title: "Beauty",
+    links: [
+      ["Makeup", "/category/makeup"],
+      ["Skin & body", "/category/skin-body"],
+      ["Tools & accessories", "/category/tools-accessories"],
+      ["Men’s grooming", "/category/mens-grooming"],
+    ],
+  },
+  {
+    title: "Shop",
+    links: [
+      ["New arrivals", "/shop?collection=new-arrivals"],
+      ["Best sellers", "/shop?collection=best-sellers"],
+      ["All brands", "/brands"],
+      ["All products", "/shop"],
+    ],
+  },
+];
+
 export function SiteChrome({ children }: { children: React.ReactNode }) {
   const [mobileNav, setMobileNav] = useState(false);
+  const [headerVisible, setHeaderVisible] = useState(true);
+  const [atTop, setAtTop] = useState(true);
   const { cartCount, wishlist } = useStorefront();
+  useEffect(() => {
+    let previousScrollY = window.scrollY;
+    let frame = 0;
+    const handleScroll = () => {
+      if (frame) return;
+      frame = window.requestAnimationFrame(() => {
+        const currentScrollY = window.scrollY;
+        setAtTop(currentScrollY < 24);
+        setHeaderVisible(currentScrollY < 24 || currentScrollY < previousScrollY);
+        previousScrollY = currentScrollY;
+        frame = 0;
+      });
+    };
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      window.cancelAnimationFrame(frame);
+    };
+  }, []);
   useEffect(() => {
     if (!mobileNav) return;
     const closeOnEscape = (event: KeyboardEvent) =>
@@ -93,7 +153,10 @@ export function SiteChrome({ children }: { children: React.ReactNode }) {
           </a>
         </div>
       </div>
-      <header className="site-header">
+      <div className="site-header-spacer" aria-hidden="true" />
+      <header
+        className={`site-header ${headerVisible || mobileNav ? "is-visible" : "is-hidden"} ${atTop ? "is-at-top" : "is-scrolled"}`}
+      >
         <div className="header-main container">
           <button
             className="mobile-menu"
@@ -116,17 +179,20 @@ export function SiteChrome({ children }: { children: React.ReactNode }) {
                 <NavigationMenuItem className="text-xs font-semibold">
                   <NavigationMenuTrigger>Categories</NavigationMenuTrigger>
                   <NavigationMenuContent className="category-menu-content">
-                    <div className="category-menu-grid">
-                      {categories.map((category) => (
-                        <NavigationMenuLink
-                          key={category.slug}
-                          className="category-menu-link"
-                          render={<Link href={`/category/${category.slug}`} />}
-                        >
-                          <span>{category.name}</span>
-                          <small>{category.note}</small>
-                          <ChevronRight size={14} />
-                        </NavigationMenuLink>
+                    <div className="mega-menu-columns">
+                      {megaMenuGroups.map((group) => (
+                        <div className="mega-menu-column" key={group.title}>
+                          <span className="mega-menu-title">{group.title}</span>
+                          {group.links.map(([label, href]) => (
+                            <NavigationMenuLink
+                              key={`${group.title}-${label}`}
+                              className="mega-menu-link"
+                              render={<Link href={href} />}
+                            >
+                              {label}
+                            </NavigationMenuLink>
+                          ))}
+                        </div>
                       ))}
                     </div>
                     <NavigationMenuLink
@@ -206,10 +272,23 @@ export function SiteChrome({ children }: { children: React.ReactNode }) {
                 <span>Shop all beauty</span>
                 <ArrowUpRight size={17} />
               </Link>
-              <Link href="/shop" onClick={() => setMobileNav(false)}>
-                <span>Categories</span>
-                <ChevronRight size={17} />
-              </Link>
+              <details className="mobile-category-details">
+                <summary>
+                  <span>Categories</span>
+                  <ChevronRight size={17} />
+                </summary>
+                <div className="mobile-category-links">
+                  {categories.map((category) => (
+                    <Link
+                      href={`/category/${category.slug}`}
+                      key={category.slug}
+                      onClick={() => setMobileNav(false)}
+                    >
+                      {category.name}
+                    </Link>
+                  ))}
+                </div>
+              </details>
               <Link href="/brands" onClick={() => setMobileNav(false)}>
                 <span>Brands</span>
                 <ChevronRight size={17} />
@@ -303,7 +382,8 @@ function SiteFooter() {
             </p>
             {subscribed ? (
               <div className="form-success font-semibold" role="status">
-                You’re on the list. We’ll keep the good beauty ideas coming.
+                Signup captured. Email delivery will be connected with the
+                newsletter service.
               </div>
             ) : (
               <form
@@ -397,6 +477,9 @@ function SiteFooter() {
             <Link className="font-semibold" href="/brands">
               Brands
             </Link>
+            <Link className="font-semibold" href="/faq">
+              FAQs
+            </Link>
           </div>
           <div className="footer-col footer-visit">
             <span className="font-bold">Visit us</span>
@@ -427,6 +510,10 @@ function SiteFooter() {
             ·{" "}
             <Link className="font-bold" href="/policies/terms">
               Terms
+            </Link>
+            ·{" "}
+            <Link className="font-bold" href="/policies/cookies">
+              Cookies
             </Link>
           </span>
         </div>
