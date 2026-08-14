@@ -23,6 +23,15 @@ export type Product = {
 export const image = (id: string, width = 900) =>
   `https://images.unsplash.com/${id}?auto=format&fit=crop&w=${width}&q=85`;
 
+export const slugify = (value: string) => value
+  .toLowerCase()
+  .normalize("NFKD")
+  .replace(/[\u0300-\u036f]/g, "")
+  .replace(/[&]/g, " ")
+  .replace(/[’']/g, "")
+  .replace(/[^a-z0-9]+/g, "-")
+  .replace(/^-|-$/g, "");
+
 export const products: Product[] = [
   { id: "black-opal", slug: "black-opal-skin-perfecting-stick-foundation", brand: "Black Opal", name: "Skin Perfecting Stick Foundation", price: 22.99, category: "Makeup", type: "Makeup", image: image("photo-1596462502278-27bfdc403348"), imageAlt: "Black Opal makeup collection", rating: 4.5, reviews: 24, tag: "Shade range", inventory: 8, sku: "027811037926", description: "Maximum coverage with a soft matte finish, created for normal to dry skin and a broad spectrum of deeper tones.", options: ["Cool Nude", "Champagne Beige", "Cashew", "Kalahari Sand", "Heavenly Honey", "Rich Caramel", "Truly Topaz", "Warm Almond", "Nutmeg", "Amber", "Beautiful Bronze", "Hazelnut", "Toasted Chestnut", "Carob", "Sweet Espresso", "Suede Mocha", "Black Walnut", "Ebony Brown", "Au Chocolat", "Yes Honey", "Snatched Sepia"] },
   { id: "darling-empress", slug: "darling-empress-passion-twist", brand: "Darling", name: "Empress Passion Twist", price: 12.99, category: "Wigs & Extensions", type: "Wigs", image: image("photo-1522337360788-8b13dee7a37e"), imageAlt: "Textured hair styling", rating: 4.5, reviews: 18, tag: "Bestseller", inventory: 22, sku: "AG-DARLING-PT", description: "Pre-looped passion twist hair for a confident protective style with a soft, natural finish.", options: ["1B", "2", "4", "27", "30"] },
@@ -45,6 +54,9 @@ export const categories = [
   { slug: "mens-grooming", name: "Men’s grooming", note: "Everyday care", image: image("photo-1621605815971-fbc98d665033") },
   { slug: "tools-accessories", name: "Tools & accessories", note: "Finish the look", image: image("photo-1522335789203-aabd1fc54bc9") },
 ];
+
+export const categorySlug = (category: string) =>
+  categories.find((item) => item.name.toLowerCase() === category.toLowerCase())?.slug || slugify(category);
 
 export const brands = ["Sensationnel", "Shea Moisture", "ORS", "Ebin New York", "Palmer’s", "Sleek Makeup", "Cantu", "Freetress Equal"];
 

@@ -27,8 +27,14 @@ export function StorefrontProvider({ children }: { children: React.ReactNode }) 
     try {
       const savedCart = window.localStorage.getItem("aglory-cart");
       const savedWishlist = window.localStorage.getItem("aglory-wishlist");
-      if (savedCart) setCart(JSON.parse(savedCart));
-      if (savedWishlist) setWishlist(JSON.parse(savedWishlist));
+      // Restore the browser-only bag after hydration so the server and client render the same shell.
+      if (savedCart) {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        setCart(JSON.parse(savedCart));
+      }
+      if (savedWishlist) {
+        setWishlist(JSON.parse(savedWishlist));
+      }
     } catch {
       // Start with an empty bag if saved data cannot be read.
     } finally {
