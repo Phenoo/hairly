@@ -7,20 +7,15 @@ import {
   Heart,
   Menu,
   Phone,
-  Search,
   ShoppingBag,
   UserRound,
   X,
 } from "lucide-react";
-import {
-  FaFacebookF,
-  FaInstagram,
-  FaTiktok,
-  FaWhatsapp,
-} from "react-icons/fa6";
+import { FaWhatsapp } from "react-icons/fa6";
 import { useEffect, useState } from "react";
 import { useStorefront } from "@/lib/storefront-context";
 import { categories } from "@/lib/store-data";
+import { HeaderSearch } from "@/components/header-search";
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -32,34 +27,34 @@ import {
 
 const megaMenuGroups = [
   {
-    title: "Hair",
+    title: "Hair care",
     links: [
-      ["Hair care", "/category/hair-care"],
-      ["Shampoo & conditioner", "/category/hair-care"],
-      ["Treatments & styling", "/category/hair-care"],
-      ["Hair colour", "/category/hair-care"],
+      ["All hair care", "/category/hair-care"],
+      ["Treatments & masks", "/search?q=treatment"],
+      ["Oils & serums", "/search?q=serum"],
+      ["Scalp care", "/search?q=scalp"],
     ],
   },
   {
-    title: "Wigs & extensions",
+    title: "Protective styling",
     links: [
-      ["Wigs", "/category/wigs-extensions"],
-      ["Braiding hair", "/category/wigs-extensions"],
-      ["Crochet & weaves", "/category/wigs-extensions"],
-      ["Hair pieces", "/category/wigs-extensions"],
+      ["All wigs & extensions", "/category/wigs-extensions"],
+      ["Braiding hair", "/search?q=braid"],
+      ["Twists", "/search?q=twist"],
+      ["Human hair", "/search?q=human%20hair"],
     ],
   },
   {
-    title: "Beauty",
+    title: "Skin, makeup & grooming",
     links: [
       ["Makeup", "/category/makeup"],
       ["Skin & body", "/category/skin-body"],
-      ["Tools & accessories", "/category/tools-accessories"],
       ["Men’s grooming", "/category/mens-grooming"],
+      ["Tools & accessories", "/category/tools-accessories"],
     ],
   },
   {
-    title: "Shop",
+    title: "More ways to shop",
     links: [
       ["New arrivals", "/shop?collection=new-arrivals"],
       ["Best sellers", "/shop?collection=best-sellers"],
@@ -116,40 +111,17 @@ export function SiteChrome({ children }: { children: React.ReactNode }) {
           <span>01322 333305</span>
         </a>
         <span className="announcement-text">
-          Same-day delivery available when you order before 12pm
+          Visit us in Erith · Local delivery availability confirmed by our team
         </span>
         <div className="announcement-socials">
           <a
-            href="https://www.instagram.com"
+            href="https://wa.me/447446841404"
             target="_blank"
             rel="noreferrer"
-            aria-label="Instagram"
-          >
-            <FaInstagram size={13} />
-          </a>
-          <a
-            href="https://wa.me/4407446841404"
-            target="_blank"
-            rel="noreferrer"
-            aria-label="WhatsApp"
+            aria-label="Contact A-Glory on WhatsApp"
           >
             <FaWhatsapp size={13} />
-          </a>
-          <a
-            href="https://www.tiktok.com"
-            target="_blank"
-            rel="noreferrer"
-            aria-label="TikTok"
-          >
-            <FaTiktok size={13} />
-          </a>
-          <a
-            href="https://www.facebook.com"
-            target="_blank"
-            rel="noreferrer"
-            aria-label="Facebook"
-          >
-            <FaFacebookF size={12} />
+            <span>WhatsApp</span>
           </a>
         </div>
       </div>
@@ -168,16 +140,16 @@ export function SiteChrome({ children }: { children: React.ReactNode }) {
           <Link
             className="logo"
             href="/"
-            aria-label="Aglory Hair and Cosmetics home"
+            aria-label="A-Glory Hair and Cosmetics home"
           >
             <span>ag</span>lory
           </Link>
+          <HeaderSearch />
           <nav className="desktop-nav" aria-label="Main navigation">
-            <Link href="/shop">Shop</Link>
             <NavigationMenu className="category-navigation">
               <NavigationMenuList>
                 <NavigationMenuItem className="text-xs font-semibold">
-                  <NavigationMenuTrigger>Categories</NavigationMenuTrigger>
+                  <NavigationMenuTrigger>Shop</NavigationMenuTrigger>
                   <NavigationMenuContent className="category-menu-content">
                     <div className="mega-menu-columns">
                       {megaMenuGroups.map((group) => (
@@ -205,14 +177,14 @@ export function SiteChrome({ children }: { children: React.ReactNode }) {
                 </NavigationMenuItem>
               </NavigationMenuList>
             </NavigationMenu>
+            <Link href="/category/hair-care">Hair care</Link>
+            <Link href="/category/wigs-extensions">Wigs & extensions</Link>
+            <Link href="/category/skin-body">Skin & body</Link>
+            <Link href="/category/makeup">Makeup</Link>
             <Link href="/brands">Brands</Link>
-            <Link href="/blog">Blog</Link>
+            <Link className="nav-offers" href="/shop?collection=best-sellers">Offers</Link>
           </nav>
           <div className="header-actions">
-            <Link className="icon-label" href="/search">
-              <Search size={19} />
-              <span>Search</span>
-            </Link>
             <Link className="icon-label hide-small" href="/login">
               <UserRound size={19} />
               <span>Account</span>
@@ -243,7 +215,7 @@ export function SiteChrome({ children }: { children: React.ReactNode }) {
           >
             <div className="mobile-nav-top">
               <div>
-                <span className="mobile-nav-label">Aglory menu</span>
+                <span className="mobile-nav-label">A-Glory menu</span>
                 <Link
                   className="logo"
                   href="/"
@@ -261,7 +233,7 @@ export function SiteChrome({ children }: { children: React.ReactNode }) {
               </button>
             </div>
             <div className="mobile-nav-intro">
-              <span>Beauty, made brilliantly personal.</span>
+              <HeaderSearch onNavigate={() => setMobileNav(false)} />
             </div>
             <nav className="mobile-nav-links" aria-label="Mobile menu links">
               <Link
@@ -274,7 +246,7 @@ export function SiteChrome({ children }: { children: React.ReactNode }) {
               </Link>
               <details className="mobile-category-details">
                 <summary>
-                  <span>Categories</span>
+                  <span>Shop by category</span>
                   <ChevronRight size={17} />
                 </summary>
                 <div className="mobile-category-links">
@@ -294,7 +266,11 @@ export function SiteChrome({ children }: { children: React.ReactNode }) {
                 <ChevronRight size={17} />
               </Link>
               <Link href="/blog" onClick={() => setMobileNav(false)}>
-                <span>Beauty blog</span>
+                <span>Beauty advice</span>
+                <ChevronRight size={17} />
+              </Link>
+              <Link href="/shop?collection=new-arrivals" onClick={() => setMobileNav(false)}>
+                <span>New arrivals</span>
                 <ChevronRight size={17} />
               </Link>
             </nav>
@@ -317,36 +293,12 @@ export function SiteChrome({ children }: { children: React.ReactNode }) {
               </a>
               <div className="mobile-nav-socials">
                 <a
-                  href="https://www.instagram.com"
-                  target="_blank"
-                  rel="noreferrer"
-                  aria-label="Instagram"
-                >
-                  <FaInstagram size={15} />
-                </a>
-                <a
-                  href="https://wa.me/4407446841404"
+                  href="https://wa.me/447446841404"
                   target="_blank"
                   rel="noreferrer"
                   aria-label="WhatsApp"
                 >
                   <FaWhatsapp size={15} />
-                </a>
-                <a
-                  href="https://www.tiktok.com"
-                  target="_blank"
-                  rel="noreferrer"
-                  aria-label="TikTok"
-                >
-                  <FaTiktok size={15} />
-                </a>
-                <a
-                  href="https://www.facebook.com"
-                  target="_blank"
-                  rel="noreferrer"
-                  aria-label="Facebook"
-                >
-                  <FaFacebookF size={14} />
                 </a>
               </div>
             </div>
@@ -360,55 +312,31 @@ export function SiteChrome({ children }: { children: React.ReactNode }) {
 }
 
 function SiteFooter() {
-  const [subscribed, setSubscribed] = useState(false);
   return (
     <>
       <section className="newsletter">
         <div className="container newsletter-inner">
           <div>
             <span className="eyebrow font-bold">
-              A little beauty in your inbox
+              Product advice from real people
             </span>
             <h2 className="font-semibold">
-              Your beauty inbox,
+              Not sure what
               <br />
-              <em>upgraded.</em>
+              <em>to choose?</em>
             </h2>
           </div>
           <div>
             <p className="font-medium">
-              Get exclusive offers, beauty tips, and early access to new
-              arrivals directly in your inbox.
+              Ask the Erith store team about textures, shades, routines or
+              availability before you buy.
             </p>
-            {subscribed ? (
-              <div className="form-success font-semibold" role="status">
-                Signup captured. Email delivery will be connected with the
-                newsletter service.
-              </div>
-            ) : (
-              <form
-                className="newsletter-form"
-                onSubmit={(event) => {
-                  event.preventDefault();
-                  setSubscribed(true);
-                }}
-              >
-                <input
-                  type="email"
-                  placeholder="Your email address"
-                  aria-label="Your email address"
-                  className="font-semibold"
-                  required
-                />
-                <button type="submit" className="font-bold">
-                  Join the community <span>→</span>
-                </button>
-              </form>
-            )}
-            <small className="font-medium">
-              By subscribing, you agree to receive Aglory updates. Unsubscribe
-              anytime.
-            </small>
+            <div className="newsletter-actions">
+              <a className="button button-dark" href="https://wa.me/447446841404" target="_blank" rel="noreferrer">
+                WhatsApp the team <ArrowUpRight size={15} />
+              </a>
+              <Link className="text-button" href="/contact">Contact & store details</Link>
+            </div>
           </div>
         </div>
       </section>
@@ -422,17 +350,8 @@ function SiteFooter() {
               The destination for beauty that understands you.
             </p>
             <div className="socials">
-              <a href="https://www.instagram.com" aria-label="Instagram">
-                <FaInstagram />
-              </a>
-              <a href="https://wa.me/4407446841404" aria-label="WhatsApp">
+              <a href="https://wa.me/447446841404" aria-label="WhatsApp A-Glory">
                 <FaWhatsapp />
-              </a>
-              <a href="https://www.tiktok.com" aria-label="TikTok">
-                <FaTiktok />
-              </a>
-              <a href="https://www.facebook.com" aria-label="Facebook">
-                <FaFacebookF />
               </a>
             </div>
           </div>
@@ -484,7 +403,7 @@ function SiteFooter() {
           <div className="footer-col footer-visit">
             <span className="font-bold">Visit us</span>
             <p className="font-semibold">
-              Aglory Hair and Cosmetics
+              A-Glory Hair and Cosmetics
               <br />8 Cross Street
               <br />
               Erith, Kent DA8 1RB
@@ -501,7 +420,7 @@ function SiteFooter() {
           </div>
         </div>
         <div className="container footer-bottom font-semibold">
-          <span>© 2026 Aglory Hair and Cosmetics</span>
+          <span>© 2026 A-Glory Hair and Cosmetics</span>
           <span>Beauty, culture, confidence.</span>
           <span>
             <Link className="font-bold" href="/policies/privacy">
@@ -520,10 +439,10 @@ function SiteFooter() {
       </footer>
       <a
         className="whatsapp-float font-bold"
-        href="https://wa.me/4407446841404"
+        href="https://wa.me/447446841404"
         target="_blank"
         rel="noreferrer"
-        aria-label="Message Aglory Hair and Cosmetics on WhatsApp"
+        aria-label="Message A-Glory Hair and Cosmetics on WhatsApp"
       >
         <span>
           <FaWhatsapp size={18} />

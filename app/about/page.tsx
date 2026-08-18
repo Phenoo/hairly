@@ -1,9 +1,9 @@
 import { UtilityPage } from "@/components/route-ui";
-export const metadata = { title: "About Aglory Hair and Cosmetics" };
+export const metadata = { title: "About A-Glory Hair and Cosmetics" };
 export default function AboutRoute() {
   return (
     <UtilityPage
-      eyebrow="About Aglory"
+      eyebrow="About A-Glory"
       title={
         <>
           Beauty that
@@ -11,7 +11,7 @@ export default function AboutRoute() {
           <em>understands you.</em>
         </>
       }
-      body="Aglory is your local beauty destination for hair, skin, cosmetics, protective styling and expert advice."
+      body="A-Glory is your local beauty destination for hair, skin, cosmetics, protective styling and expert advice."
     />
   );
 }

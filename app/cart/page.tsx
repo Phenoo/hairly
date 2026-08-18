@@ -1,5 +1,5 @@
 import { CartPage } from "@/components/route-ui";
-export const metadata = { title: "Your Bag | Aglory Hair and Cosmetics" };
+export const metadata = { title: "Your Bag | A-Glory Hair and Cosmetics" };
 export default function CartRoute() {
   return (
     <section className="route-page container section-space">

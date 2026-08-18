@@ -9,8 +9,8 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const { slug } = await params;
   const product = getProduct(slug);
   return product
-    ? { title: `${product.name} | Aglory Hair and Cosmetics`, description: product.description }
-    : { title: "Product | Aglory Hair and Cosmetics" };
+    ? { title: `${product.name} | A-Glory Hair and Cosmetics`, description: product.description }
+    : { title: "Product | A-Glory Hair and Cosmetics" };
 }
 export default async function ProductPage({
   params,

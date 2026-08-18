@@ -10,8 +10,8 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const { slug } = await params;
   const category = categories.find((item) => item.slug === slug);
   return category
-    ? { title: `${category.name} | Aglory Hair and Cosmetics`, description: `${category.name} for every texture, tone and routine at Aglory Hair and Cosmetics.` }
-    : { title: "Collection | Aglory Hair and Cosmetics" };
+    ? { title: `${category.name} | A-Glory Hair and Cosmetics`, description: `${category.name} for every texture, tone and routine at A-Glory Hair and Cosmetics.` }
+    : { title: "Collection | A-Glory Hair and Cosmetics" };
 }
 export default async function CategoryPage({
   params,

@@ -1,7 +1,8 @@
 "use client";
 import { useState } from "react";
 import Link from "next/link";
-import { ArrowRight, Check, Heart, ShoppingBag } from "lucide-react";
+import Image from "next/image";
+import { ArrowRight, Check, ChevronRight, Heart, MapPin, ShoppingBag } from "lucide-react";
 import type { Product } from "@/lib/store-data";
 import { categorySlug, money, products } from "@/lib/store-data";
 import { useStorefront } from "@/lib/storefront-context";
@@ -45,25 +46,26 @@ export function ProductDetail({ product }: { product: Product }) {
     <section className="product-detail container section-space">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(productSchema) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
+      <nav className="breadcrumbs" aria-label="Breadcrumb">
+        <Link href="/">Home</Link><ChevronRight size={13} />
+        <Link href={`/category/${categorySlug(product.category)}`}>{product.category}</Link><ChevronRight size={13} />
+        <span aria-current="page">{product.name}</span>
+      </nav>
       <div className="product-detail-grid">
         <div className="product-detail-image">
-          <img src={product.image} alt={product.imageAlt} />
+          <Image src={product.image} alt={product.imageAlt} width={1000} height={1200} sizes="(max-width: 900px) 100vw, 55vw" preload />
         </div>
         <div className="product-detail-copy">
-          <Link
-            className="eyebrow"
-            href={`/category/${categorySlug(product.category)}`}
-          >
-            {product.category}
+          <Link className="product-brand-link" href={`/brands/${product.brand.toLowerCase().replaceAll(" ", "-")}`}>
+            {product.brand}
           </Link>
-          <span className="eyebrow">{product.brand}</span>
           <h1>{product.name}</h1>
           <div className={`stock-state detail-stock ${product.inventory <= 0 ? "is-out" : product.inventory <= 5 ? "is-low" : ""}`}>
             {product.inventory <= 0
               ? "Currently unavailable"
               : product.inventory <= 5
                 ? `Only ${product.inventory} left`
-                : "Available now"}
+                : "In stock"}
           </div>
           <div className="detail-price">
             {money(product.price)}{" "}
@@ -130,13 +132,13 @@ export function ProductDetail({ product }: { product: Product }) {
           )}
           <div className="modal-notes">
             <span>
-              <Check size={14} /> Same-day delivery available
+              <Check size={14} /> Delivery timing confirmed at checkout
             </span>
             <span>
               <Check size={14} /> 30-day returns
             </span>
             <span>
-              <Check size={14} /> Secure checkout
+              <MapPin size={14} /> Erith store collection available
             </span>
           </div>
           <div className="collection-note">
@@ -153,8 +155,9 @@ export function ProductDetail({ product }: { product: Product }) {
         <details>
           <summary>Delivery & returns</summary>
           <p>
-            Same-day delivery is available locally when orders are placed before
-            12pm. Aglory offers 30-day returns on eligible items.
+            Delivery timing and charges are confirmed before payment. Eligible
+            items can be returned within 30 days; hygiene and opened-product
+            exclusions apply.
           </p>
         </details>
         <details>
@@ -162,7 +165,7 @@ export function ProductDetail({ product }: { product: Product }) {
           <p>
             Our Erith store team can help you choose a shade, texture or
             routine.{" "}
-            <a href="https://wa.me/4407446841404">WhatsApp the team.</a>
+            <a href="https://wa.me/447446841404">WhatsApp the team.</a>
           </p>
         </details>
         {product.details?.length ? (

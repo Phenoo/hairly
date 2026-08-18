@@ -10,8 +10,8 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const { slug } = await params;
   const brand = brands.find((item) => slugify(item) === slug);
   return brand
-    ? { title: `${brand} | Aglory Hair and Cosmetics`, description: `Shop ${brand} products at Aglory Hair and Cosmetics.` }
-    : { title: "Brand | Aglory Hair and Cosmetics" };
+    ? { title: `${brand} | A-Glory Hair and Cosmetics`, description: `Shop ${brand} products at A-Glory Hair and Cosmetics.` }
+    : { title: "Brand | A-Glory Hair and Cosmetics" };
 }
 export default async function BrandPage({
   params,
@@ -34,7 +34,7 @@ export default async function BrandPage({
     >
       <ShopCatalog
         items={items}
-        eyebrow={`${brand} · Aglory brand page`}
+        eyebrow={`${brand} · A-Glory brand page`}
         title={
           <>
             {brand} <em>collection.</em>

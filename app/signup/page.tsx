@@ -1,7 +1,7 @@
 import { AuthPage } from "@/components/auth-ui";
 
 export const metadata = {
-  title: "Create an account | Aglory Hair and Cosmetics",
+  title: "Create an account | A-Glory Hair and Cosmetics",
 };
 
 export default function SignupPage() {

@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import type { Product } from "./store-data";
+import { products } from "./store-data";
 
 export type CartLine = { product: Product; quantity: number; option?: string };
 
@@ -17,6 +18,10 @@ type StorefrontContextValue = {
 };
 
 const StorefrontContext = createContext<StorefrontContextValue | null>(null);
+const CART_STORAGE_KEY = "aglory-cart:v2";
+const WISHLIST_STORAGE_KEY = "aglory-wishlist:v2";
+
+type StoredCartLine = { productId: string; quantity: number; option?: string };
 
 export function StorefrontProvider({
   children,
@@ -29,15 +34,22 @@ export function StorefrontProvider({
 
   useEffect(() => {
     try {
-      const savedCart = window.localStorage.getItem("aglory-cart");
-      const savedWishlist = window.localStorage.getItem("aglory-wishlist");
+      const savedCart = window.localStorage.getItem(CART_STORAGE_KEY);
+      const savedWishlist = window.localStorage.getItem(WISHLIST_STORAGE_KEY);
       // Restore the browser-only bag after hydration so the server and client render the same shell.
       if (savedCart) {
+        const storedLines = JSON.parse(savedCart) as StoredCartLine[];
         // eslint-disable-next-line react-hooks/set-state-in-effect
-        setCart(JSON.parse(savedCart));
+        setCart(
+          storedLines.flatMap((line) => {
+            const product = products.find((item) => item.id === line.productId);
+            return product ? [{ product, quantity: line.quantity, option: line.option }] : [];
+          }),
+        );
       }
       if (savedWishlist) {
-        setWishlist(JSON.parse(savedWishlist));
+        const productIds = JSON.parse(savedWishlist) as string[];
+        setWishlist(products.filter((product) => productIds.includes(product.id)));
       }
     } catch {
       // Start with an empty bag if saved data cannot be read.
@@ -48,8 +60,17 @@ export function StorefrontProvider({
 
   useEffect(() => {
     if (!hydrated) return;
-    window.localStorage.setItem("aglory-cart", JSON.stringify(cart));
-    window.localStorage.setItem("aglory-wishlist", JSON.stringify(wishlist));
+    try {
+      const storedCart: StoredCartLine[] = cart.map((line) => ({
+        productId: line.product.id,
+        quantity: line.quantity,
+        option: line.option,
+      }));
+      window.localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(storedCart));
+      window.localStorage.setItem(WISHLIST_STORAGE_KEY, JSON.stringify(wishlist.map((product) => product.id)));
+    } catch {
+      // Shopping still works for the current visit if browser storage is unavailable.
+    }
   }, [cart, wishlist, hydrated]);
 
   const value = useMemo(

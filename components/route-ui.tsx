@@ -8,7 +8,6 @@ import {
   Check,
   ChevronDown,
   Heart,
-  LockKeyhole,
   PackageCheck,
   Search,
   ShoppingBag,
@@ -26,7 +25,7 @@ import {
 } from "@/lib/store-data";
 import { ProductGrid } from "@/components/product-card";
 import { useStorefront } from "@/lib/storefront-context";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export function RouteIntro({
   eyebrow,
@@ -53,7 +52,7 @@ export function ShopCatalog({
       Shop all <em>beauty.</em>
     </>
   ),
-  eyebrow = "Aglory catalogue",
+  eyebrow = "A-Glory catalogue",
 }: {
   items?: Product[];
   title?: React.ReactNode;
@@ -240,7 +239,7 @@ export function ShopCatalog({
         <div className="utility-card">
           <Search size={25} />
           <h2>No products in this view.</h2>
-          <p>Try another category or browse all of Aglory.</p>
+          <p>Try another category or browse all of A-Glory.</p>
           <Link className="button button-outline" href="/shop">
             View all products
           </Link>
@@ -249,7 +248,7 @@ export function ShopCatalog({
       <div className="shop-guide">
         <div>
           <span>
-            <strong>Need a little help?</strong> Speak with the Aglory team on
+            <strong>Need a little help?</strong> Speak with the A-Glory team on
             WhatsApp and we’ll help you choose.
           </span>
         </div>
@@ -266,22 +265,11 @@ export function ShopCatalog({
   );
 }
 
-const brandDomains: Record<string, string> = {
-  Sensationnel: "sensationnel.com",
-  "Shea Moisture": "sheamoisture.com",
-  ORS: "orshaircare.com",
-  "Ebin New York": "ebinnewyork.com",
-  "Palmer’s": "palmers.com",
-  "Sleek Makeup": "sleekmakeup.com",
-  Cantu: "cantubeauty.com",
-  "Freetress Equal": "freetress.com",
-};
-
 export function BrandsIndex() {
   return (
     <section className="route-page brands-page container section-space">
       <RouteIntro
-        eyebrow="The Aglory index"
+        eyebrow="The A-Glory index"
         title={
           <>
             Brands with <em>intention.</em>
@@ -330,10 +318,7 @@ export function BrandsIndex() {
                 {String(index + 1).padStart(2, "0")}
               </span>
               <span className="brand-logo">
-                <img
-                  src={`https://www.google.com/s2/favicons?domain=${brandDomains[brand]}&sz=128`}
-                  alt={`${brand} logo`}
-                />
+                <span aria-hidden="true">{brand.slice(0, 2).toUpperCase()}</span>
               </span>
               <strong>{brand}</strong>
               <ArrowUpRight size={16} />
@@ -473,7 +458,7 @@ export function BlogIndex() {
   return (
     <section className="route-page container section-space">
       <RouteIntro
-        eyebrow="The Aglory Blog"
+        eyebrow="The A-Glory Blog"
         title={
           <>
             Beauty wisdom
@@ -537,7 +522,7 @@ export function BlogArticle({ slug }: { slug: string }) {
         <ul>
           <li>Consistency matters more than complexity.</li>
           <li>Choose products that suit your texture and lifestyle.</li>
-          <li>Ask for advice when you need it — Aglory is here to help.</li>
+          <li>Ask for advice when you need it — A-Glory is here to help.</li>
         </ul>
         <Link className="button button-dark" href="/shop">
           Shop beauty <ArrowRight size={16} />
@@ -552,31 +537,31 @@ export function AccountPage() {
   return (
     <section className="account-page container section-space">
       <RouteIntro
-        eyebrow="Welcome back"
+        eyebrow="Saved on this device"
         title={
           <>
-            Your beauty <em>dashboard.</em>
+            Your shopping <em>shortcuts.</em>
           </>
         }
-        body="Keep your favorites close, track your orders and pick up where your routine left off."
+        body="Accounts are not connected yet. Your wishlist and bag are stored only in this browser."
       />
       <div className="account-grid">
         <div className="account-card account-welcome">
           <span className="account-avatar">A</span>
-          <span className="eyebrow">Your Aglory account</span>
+          <span className="eyebrow">Account service coming soon</span>
           <h2>
-            Ready for your next
+            Continue your
             <br />
-            <em>good hair day?</em>
+            <em>current shop.</em>
           </h2>
           <Link className="button button-dark" href="/shop">
-            Buy again <ArrowRight size={16} />
+            Browse products <ArrowRight size={16} />
           </Link>
         </div>
         <div className="account-card">
           <span className="eyebrow">Recent orders</span>
           <h3>No orders yet</h3>
-          <p>Orders will appear here after the live checkout is connected.</p>
+          <p>Order history will appear after secure customer accounts and checkout are connected.</p>
           <Link className="text-button" href="/shop">
             Start shopping <ArrowRight size={15} />
           </Link>
@@ -614,7 +599,6 @@ export function AccountPage() {
 }
 
 export function ContactPage() {
-  const [sent, setSent] = useState(false);
   return (
     <section className="contact-page container section-space">
       <div className="contact-intro">
@@ -626,7 +610,7 @@ export function ContactPage() {
         </h1>
         <p>
           Questions about a product, your next style or a same-day delivery? The
-          Aglory team is here.
+          A-Glory team is here.
         </p>
         <div className="contact-details">
           <a href="tel:01322333305">
@@ -634,7 +618,7 @@ export function ContactPage() {
             <strong>01322 333305</strong>
           </a>
           <a
-            href="https://wa.me/4407446841404"
+            href="https://wa.me/447446841404"
             target="_blank"
             rel="noreferrer"
           >
@@ -648,7 +632,7 @@ export function ContactPage() {
         </div>
         <div className="contact-store-card">
           <span className="eyebrow">Visit the store</span>
-          <strong>Aglory Hair and Cosmetics</strong>
+          <strong>A-Glory Hair and Cosmetics</strong>
           <p>8 Cross Street, Erith, Kent DA8 1RB</p>
           <p>Mon–Sat 9am–7pm · Sun 11am–4pm</p>
           <a
@@ -662,76 +646,25 @@ export function ContactPage() {
         </div>
       </div>
       <div className="contact-form-card">
-        <span className="eyebrow">Send a note</span>
-        {sent ? (
-          <div className="form-success-panel" role="status">
-            <Check size={25} />
-            <h2>Message received.</h2>
-            <p>
-              Thanks for getting in touch. Your message is ready to be connected
-              to the Aglory inbox.
-            </p>
-            <button
-              className="button button-outline"
-              type="button"
-              onClick={() => setSent(false)}
-            >
-              Send another message
-            </button>
-          </div>
-        ) : (
-          <>
-            <h2>
-              What can we help
-              <br />
-              <em>you find?</em>
-            </h2>
-            <form
-              onSubmit={(event) => {
-                event.preventDefault();
-                setSent(true);
-              }}
-            >
-              <label>
-                <span>Your name</span>
-                <input
-                  required
-                  placeholder="Your name"
-                  aria-label="Your name"
-                />
-              </label>
-              <label>
-                <span>Email address</span>
-                <input
-                  required
-                  type="email"
-                  placeholder="Email address"
-                  aria-label="Email address"
-                />
-              </label>
-              <label>
-                <span>What do you need help with?</span>
-                <select aria-label="What do you need help with?">
-                  <option>Product advice</option>
-                  <option>Delivery & returns</option>
-                  <option>Click & collect</option>
-                  <option>Something else</option>
-                </select>
-              </label>
-              <label>
-                <span>Message</span>
-                <textarea
-                  required
-                  placeholder="Tell us a little more..."
-                  aria-label="Message"
-                />
-              </label>
-              <button className="button button-dark wide" type="submit">
-                Send message <ArrowRight size={16} />
-              </button>
-            </form>
-          </>
-        )}
+        <span className="eyebrow">Fastest ways to reach us</span>
+        <h2>
+          Ask a real
+          <br />
+          <em>store expert.</em>
+        </h2>
+        <p>
+          The website contact form stays offline until it is connected to the
+          A-Glory inbox. Call, WhatsApp or email the store directly in the meantime.
+        </p>
+        <div className="contact-direct-actions">
+          <a className="button button-dark wide" href="https://wa.me/447446841404" target="_blank" rel="noreferrer">
+            WhatsApp the team <ArrowUpRight size={16} />
+          </a>
+          <a className="button button-outline wide" href="mailto:agloryltd@aol.com">
+            Email A-Glory <ArrowRight size={16} />
+          </a>
+          <a className="text-button" href="tel:01322333305">Call 01322 333305</a>
+        </div>
       </div>
     </section>
   );
@@ -756,7 +689,7 @@ export function UtilityPage({
           <Check size={25} />
           <h2>You’re all set.</h2>
           <p>
-            Use the links above to continue shopping or get help from the Aglory
+            Use the links above to continue shopping or get help from the A-Glory
             team.
           </p>
           <Link className="button button-dark" href="/shop">
@@ -833,9 +766,9 @@ export function CartPage() {
       <div className="cart-page-total">
         <span>Subtotal</span>
         <strong>{money(cartTotal)}</strong>
-        <small>Delivery is calculated at checkout.</small>
+        <small>Stock, delivery and payment are confirmed by the store team.</small>
         <Link className="button button-dark" href="/checkout">
-          Go to checkout <ArrowRight size={16} />
+          Complete with the store <ArrowRight size={16} />
         </Link>
       </div>
     </div>
@@ -872,15 +805,19 @@ export function WishlistPage() {
 }
 
 export function SearchPage() {
-  const [query, setQuery] = useState("");
-  const [recentSearches, setRecentSearches] = useState<string[]>(() => {
-    if (typeof window === "undefined") return [];
-    try {
-      return JSON.parse(window.localStorage.getItem("aglory-recent-searches") || "[]");
-    } catch {
-      return [];
-    }
-  });
+  const searchParams = useSearchParams();
+  const [query, setQuery] = useState(searchParams.get("q") || "");
+  const [recentSearches, setRecentSearches] = useState<string[]>([]);
+  useEffect(() => {
+    const loadRecentSearches = window.setTimeout(() => {
+      try {
+        setRecentSearches(JSON.parse(window.localStorage.getItem("aglory-recent-searches:v1") || "[]"));
+      } catch {
+        setRecentSearches([]);
+      }
+    }, 0);
+    return () => window.clearTimeout(loadRecentSearches);
+  }, []);
   const normalized = query.trim().toLowerCase();
   const searchable = (product: Product) =>
     `${product.brand} ${product.name} ${product.category} ${product.type} ${product.description}`.toLowerCase();
@@ -906,7 +843,11 @@ export function SearchPage() {
     setQuery(term);
     const next = [term, ...recentSearches.filter((item) => item.toLowerCase() !== term.toLowerCase())].slice(0, 5);
     setRecentSearches(next);
-    window.localStorage.setItem("aglory-recent-searches", JSON.stringify(next));
+    try {
+      window.localStorage.setItem("aglory-recent-searches:v1", JSON.stringify(next));
+    } catch {
+      // Search remains usable when storage is unavailable.
+    }
   };
   return (
     <section className="route-page container section-space">
@@ -1021,42 +962,12 @@ export function SearchPage() {
 
 export function CheckoutPage() {
   const { cart, cartTotal } = useStorefront();
-  const [complete, setComplete] = useState(false);
-  const [paymentMethod, setPaymentMethod] = useState("card");
-  const [postcode, setPostcode] = useState("");
-  const [postcodeMessage, setPostcodeMessage] = useState("");
-  if (complete)
-    return (
-      <section className="utility-page container section-space">
-        <div className="utility-card">
-          <Check size={28} />
-          <span className="eyebrow">Order details ready</span>
-          <h2>Your order is ready for checkout.</h2>
-          <p>
-            Payment isn’t charged in this preview. Your selected payment method
-            and delivery details are ready for Shopify Checkout.
-          </p>
-          <div className="utility-actions">
-            <Link className="button button-dark" href="/shop">
-              Continue shopping <ArrowRight size={16} />
-            </Link>
-            <Link className="button button-outline" href="/contact">
-              Need help?
-            </Link>
-          </div>
-        </div>
-      </section>
-    );
   if (!cart.length)
     return (
       <section className="utility-page container section-space">
         <RouteIntro
           eyebrow="Checkout"
-          title={
-            <>
-              Your bag is <em>empty.</em>
-            </>
-          }
+          title={<>Your bag is <em>empty.</em></>}
           body="Add a product before checking out."
         />
         <div className="utility-card">
@@ -1068,154 +979,40 @@ export function CheckoutPage() {
         </div>
       </section>
     );
+
   return (
     <section className="checkout-page container section-space">
       <RouteIntro
-        eyebrow="Secure checkout"
-        title={
-          <>
-            Complete your <em>order.</em>
-          </>
-        }
-        body="Enter your details and choose how you’d like to receive your order. Payment activation will be completed with Shopify Checkout."
+        eyebrow="Order support"
+        title={<>Your bag is <em>ready.</em></>}
+        body="Online payment is not connected yet. Your bag is saved on this device, and the A-Glory store team can confirm stock, delivery and payment."
       />
-      <form
-        className="checkout-form"
-        onSubmit={(event) => {
-          event.preventDefault();
-          setComplete(true);
-        }}
-      >
+      <div className="checkout-handoff">
         <div className="checkout-fields">
-          <h2>Delivery details</h2>
-          <div className="postcode-checker">
-            <div>
-              <span className="eyebrow">Delivery check</span>
-              <strong>Check your postcode</strong>
-              <p>We’ll confirm delivery eligibility and the fee before payment.</p>
-            </div>
-            <div className="postcode-checker-controls">
-              <input
-                value={postcode}
-                onChange={(event) => setPostcode(event.target.value.toUpperCase())}
-                placeholder="e.g. DA8 1RB"
-                aria-label="Postcode for delivery check"
-                autoComplete="postal-code"
-              />
-              <button
-                type="button"
-                className="button button-outline"
-                onClick={() => {
-                  const valid = /^[A-Z]{1,2}\d[A-Z\d]?\s?\d[A-Z]{2}$/i.test(postcode.trim());
-                  setPostcodeMessage(valid ? "Postcode format recognised. Final eligibility and price will be confirmed before payment." : "Enter a valid UK postcode to continue.");
-                }}
-              >
-                Check
-              </button>
-            </div>
-            {postcodeMessage && <p className="postcode-message" role="status">{postcodeMessage}</p>}
+          <span className="eyebrow">Complete your order with the store</span>
+          <h2>Speak with A-Glory before paying.</h2>
+          <p>
+            We have removed the preview payment form so the site never implies
+            that money or personal details have been processed when they have not.
+          </p>
+          <div className="checkout-contact-actions">
+            <a className="button button-dark" href="https://wa.me/447446841404" target="_blank" rel="noreferrer">
+              WhatsApp the store <ArrowUpRight size={16} />
+            </a>
+            <a className="button button-outline" href="tel:01322333305">
+              Call 01322 333305
+            </a>
           </div>
-          <input
-            required
-            placeholder="Full name"
-            aria-label="Full name"
-            autoComplete="name"
-          />
-          <input
-            required
-            type="email"
-            placeholder="Email address"
-            aria-label="Email address"
-            autoComplete="email"
-          />
-          <input
-            required
-            placeholder="Address"
-            aria-label="Address"
-            autoComplete="street-address"
-          />
-          <div className="checkout-two">
-            <input
-              required
-              placeholder="Town / city"
-              aria-label="Town or city"
-              autoComplete="address-level2"
-            />
-            <input
-              required
-              pattern="[A-Za-z0-9 ]{3,10}"
-              placeholder="Postcode"
-              aria-label="Postcode"
-              autoComplete="postal-code"
-            />
+          <div className="checkout-assurance">
+            <span><PackageCheck size={17} /> Delivery and collection are confirmed against current stock.</span>
+            <span><Check size={17} /> No payment details are collected on this website yet.</span>
           </div>
-          <h2>Delivery option</h2>
-          <label className="delivery-choice">
-            <input type="radio" name="delivery" defaultChecked /> Standard
-            delivery <span>Timing and fee confirmed before payment</span>
-          </label>
-          <label className="delivery-choice">
-            <input type="radio" name="delivery" /> Click & Collect{" "}
-            <span>Collect from 8 Cross Street, Erith — availability confirmed with your order</span>
-          </label>
-          <h2>Payment method</h2>
-          <div className="checkout-payment" aria-label="Payment method">
-            <button
-              type="button"
-              className={`payment-option payment-link ${paymentMethod === "link" ? "is-selected" : ""}`}
-              onClick={() => setPaymentMethod("link")}
-              aria-pressed={paymentMethod === "link"}
-            >
-              <span>
-                <b>stripe</b> <strong>link</strong>
-              </span>
-              <i>|</i>
-              <strong>Secure</strong>
-            </button>
-            <button
-              type="button"
-              className={`payment-option payment-google ${paymentMethod === "google" ? "is-selected" : ""}`}
-              onClick={() => setPaymentMethod("google")}
-              aria-pressed={paymentMethod === "google"}
-            >
-              <strong>G Pay</strong>
-              <i>|</i>
-              <span>Secure</span>
-            </button>
-            <button
-              type="button"
-              className={`payment-option payment-paypal ${paymentMethod === "paypal" ? "is-selected" : ""}`}
-              onClick={() => setPaymentMethod("paypal")}
-              aria-pressed={paymentMethod === "paypal"}
-            >
-              <strong>PayPal</strong>
-              <span>Secure</span>
-            </button>
-            <button
-              type="button"
-              className={`payment-option payment-card ${paymentMethod === "card" ? "is-selected" : ""}`}
-              onClick={() => setPaymentMethod("card")}
-              aria-pressed={paymentMethod === "card"}
-            >
-              <LockKeyhole size={25} />
-              <strong>Debit or Credit Card</strong>
-              <span className="payment-demo-label">Secure</span>
-            </button>
-          </div>
-          <button className="button button-dark" type="submit">
-            Review order <ArrowRight size={16} />
-          </button>
         </div>
         <aside className="checkout-order">
-          <span className="eyebrow">Order summary</span>
+          <span className="eyebrow">Bag summary</span>
           {cart.map((line) => (
-            <div
-              className="checkout-order-line"
-              key={`${line.product.id}-${line.option}`}
-            >
-              <span>
-                {line.product.name} × {line.quantity}
-              </span>
+            <div className="checkout-order-line" key={`${line.product.id}-${line.option}`}>
+              <span>{line.product.name} × {line.quantity}</span>
               <strong>{money(line.product.price * line.quantity)}</strong>
             </div>
           ))}
@@ -1224,66 +1021,34 @@ export function CheckoutPage() {
             <strong>{money(cartTotal)}</strong>
           </div>
           <small className="checkout-demo-note">
-            Delivery and payment are finalised by Shopify Checkout.
+            Delivery charges are confirmed by the store team.
           </small>
         </aside>
-      </form>
+      </div>
     </section>
   );
 }
-
 export function TrackingPage() {
-  const [submitted, setSubmitted] = useState(false);
   return (
     <section className="utility-page container section-space">
       <RouteIntro
-        eyebrow="Order tracking"
-        title={
-          <>
-            Where is your
-            <br />
-            <em>order?</em>
-          </>
-        }
-        body="Enter your order number and email to see the latest delivery update."
+        eyebrow="Order support"
+        title={<>Need help with an <em>order?</em></>}
+        body="Automated order tracking will appear here once checkout and fulfilment are connected."
       />
-      {submitted ? (
-        <div className="utility-card">
-          <Check size={28} />
-          <span className="eyebrow">Order tracking</span>
-          <h2>Details received.</h2>
-          <p>
-            Your tracking request is ready. Live delivery updates will appear
-            here when orders are connected.
-          </p>
-          <Link className="button button-dark" href="/shop">
-            Continue shopping <ArrowRight size={16} />
-          </Link>
+      <div className="utility-card">
+        <PackageCheck size={28} />
+        <h2>Contact the store for a current update.</h2>
+        <p>Have your name and order details ready so the team can help quickly.</p>
+        <div className="utility-actions">
+          <a className="button button-dark" href="https://wa.me/447446841404" target="_blank" rel="noreferrer">
+            WhatsApp the team <ArrowUpRight size={16} />
+          </a>
+          <a className="button button-outline" href="tel:01322333305">
+            Call the store
+          </a>
         </div>
-      ) : (
-        <form
-          className="tracking-form utility-card"
-          onSubmit={(event) => {
-            event.preventDefault();
-            setSubmitted(true);
-          }}
-        >
-          <input
-            required
-            placeholder="Order number"
-            aria-label="Order number"
-          />
-          <input
-            required
-            type="email"
-            placeholder="Email address"
-            aria-label="Email address"
-          />
-          <button className="button button-dark" type="submit">
-            Check order <ArrowRight size={16} />
-          </button>
-        </form>
-      )}
+      </div>
     </section>
   );
 }

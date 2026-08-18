@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowUpRight, Heart } from "lucide-react";
 import { useState } from "react";
 import type { Product } from "@/lib/store-data";
@@ -22,8 +23,14 @@ export function ProductCard({ product }: { product: Product }) {
         <Heart size={17} fill={wishlisted ? "currentColor" : "none"} />
       </button>
       <Link className="product-image" href={`/products/${product.slug}`}>
-        <span className="product-tag">{product.tag || "Featured"}</span>
-        <img src={product.image} alt={product.imageAlt} />
+        {product.tag && <span className="product-tag">{product.tag}</span>}
+        <Image
+          src={product.image}
+          alt={product.imageAlt}
+          width={720}
+          height={900}
+          sizes="(max-width: 600px) 50vw, (max-width: 900px) 50vw, 25vw"
+        />
         <span className="quick-view">
           View product <ArrowUpRight size={14} />
         </span>
@@ -33,18 +40,18 @@ export function ProductCard({ product }: { product: Product }) {
         <Link className="product-name" href={`/products/${product.slug}`}>
           {product.name}
         </Link>
-        <div className={`stock-state ${product.inventory <= 0 ? "is-out" : product.inventory <= 5 ? "is-low" : ""}`}>
-          {product.inventory <= 0
-            ? "Out of stock"
-            : product.inventory <= 5
-              ? "Low stock"
-              : "Available now"}
-        </div>
+        {product.inventory <= 5 && (
+          <div className={`stock-state ${product.inventory <= 0 ? "is-out" : "is-low"}`}>
+            {product.inventory <= 0 ? "Out of stock" : "Low stock"}
+          </div>
+        )}
         <div className="product-foot">
-          <span className="price">{money(product.price)}</span>
-          {product.compareAt && (
-            <span className="compare">{money(product.compareAt)}</span>
-          )}
+          <div className="product-pricing">
+            <span className="price">{money(product.price)}</span>
+            {product.compareAt && (
+              <span className="compare">{money(product.compareAt)}</span>
+            )}
+          </div>
           {product.options ? (
             <Link className="quick-add" href={`/products/${product.slug}`}>
               Choose options
@@ -63,6 +70,9 @@ export function ProductCard({ product }: { product: Product }) {
             </button>
           )}
         </div>
+        <span className="sr-only" aria-live="polite">
+          {added ? `${product.name} added to bag` : ""}
+        </span>
       </div>
     </article>
   );

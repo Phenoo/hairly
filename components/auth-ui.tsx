@@ -1,171 +1,35 @@
 "use client";
 
 import Link from "next/link";
-import {
-  ArrowRight,
-  Check,
-  Eye,
-  EyeOff,
-  LockKeyhole,
-  Mail,
-  UserRound,
-} from "lucide-react";
-import { useState } from "react";
+import { ArrowRight, Heart, PackageCheck, UserRound } from "lucide-react";
 
 export function AuthPage({ mode }: { mode: "login" | "signup" }) {
   const signup = mode === "signup";
-  const [showPassword, setShowPassword] = useState(false);
-  const [complete, setComplete] = useState(false);
-  const [email, setEmail] = useState("");
-
-  if (complete)
-    return (
-      <section className="auth-page container section-space">
-        <div className="auth-success">
-          <Check size={30} />
-          <span className="eyebrow">Account preview</span>
-          <h1>
-            {signup ? (
-              <>
-                Your Aglory
-                <br />
-                <em>account.</em>
-              </>
-            ) : (
-              <>
-                Welcome back
-                <br />
-                <em>to Aglory.</em>
-              </>
-            )}
-          </h1>
-          <p>
-            Your details were accepted in this preview. Sign-in and saved order
-            history will be connected with the account service.
-          </p>
-          <Link className="button button-dark" href="/account">
-            View your account <ArrowRight size={16} />
-          </Link>
-        </div>
-      </section>
-    );
-
   return (
     <section className="auth-page container section-space">
-      <div className="auth-layout">
-        <div className="auth-intro hidden md:block">
-          <span className="eyebrow">Aglory Hair and Cosmetics</span>
+      <div className="auth-layout auth-layout-honest">
+        <div className="auth-intro">
+          <span className="eyebrow">A-Glory Hair and Cosmetics</span>
           <h1>
-            {signup ? (
-              <>
-                Make beauty
-                <br />
-                <em>yours.</em>
-              </>
-            ) : (
-              <>
-                Welcome
-                <br />
-                <em>back.</em>
-              </>
-            )}
+            {signup ? <>Accounts are<br /><em>coming soon.</em></> : <>Account access<br /><em>is being connected.</em></>}
           </h1>
           <p>
-            {signup
-              ? "Create an account to save your favourites, follow your orders and make your next shop easier."
-              : "Sign in to see your favourites, track your orders and pick up where you left off."}
+            We have removed the preview sign-in form because no authentication
+            service is connected. Your wishlist and bag still stay saved on this device.
           </p>
-          <div className="auth-benefits">
-            <span>
-              <Check size={15} /> Save your favourite products
-            </span>
-            <span>
-              <Check size={15} /> Track orders in one place
-            </span>
-            <span>
-              <Check size={15} /> Get beauty advice from the team
-            </span>
-          </div>
         </div>
-        <form
-          className="auth-form-card"
-          onSubmit={(event) => {
-            event.preventDefault();
-            setComplete(true);
-          }}
-        >
-          <span className="eyebrow">
-            {signup ? "Create your account" : "Sign in"}
-          </span>
-          <h2>
-            {signup ? "Join the Aglory community." : "Good to see you again."}
-          </h2>
-          {signup && (
-            <label>
-              <span>Full name</span>
-              <div className="auth-input">
-                <UserRound size={17} />
-                <input
-                  required
-                  placeholder="Your name"
-                  aria-label="Full name"
-                />
-              </div>
-            </label>
-          )}
-          <label>
-            <span>Email address</span>
-            <div className="auth-input">
-              <Mail size={17} />
-              <input
-                required
-                type="email"
-                value={email}
-                onChange={(event) => setEmail(event.target.value)}
-                placeholder="you@example.com"
-                aria-label="Email address"
-              />
-            </div>
-          </label>
-          <label>
-            <span>Password</span>
-            <div className="auth-input">
-              <LockKeyhole size={17} />
-              <input
-                required
-                minLength={6}
-                type={showPassword ? "text" : "password"}
-                placeholder="At least 6 characters"
-                aria-label="Password"
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword((current) => !current)}
-                aria-label={showPassword ? "Hide password" : "Show password"}
-              >
-                {showPassword ? <EyeOff size={17} /> : <Eye size={17} />}
-              </button>
-            </div>
-          </label>
-          {signup && (
-            <label className="auth-check">
-              <input type="checkbox" required />{" "}
-              <span>
-                I accept the <Link href="/policies/terms">terms</Link> and
-                <Link href="/policies/privacy">privacy policy</Link>.
-              </span>
-            </label>
-          )}
-          <button className="button button-dark wide" type="submit">
-            {signup ? "Create account" : "Sign in"} <ArrowRight size={16} />
-          </button>
-          <p className="auth-switch">
-            {signup ? "Already have an account?" : "New to Aglory?"}{" "}
-            <Link href={signup ? "/login" : "/signup"}>
-              {signup ? "Sign in" : "Create an account"}
-            </Link>
-          </p>
-        </form>
+        <div className="auth-form-card auth-service-card">
+          <UserRound size={30} />
+          <span className="eyebrow">No password needed yet</span>
+          <h2>Keep shopping while accounts are prepared.</h2>
+          <div className="auth-benefits">
+            <Link href="/wishlist"><Heart size={16} /> View your saved products</Link>
+            <Link href="/track-order"><PackageCheck size={16} /> Get order support</Link>
+          </div>
+          <Link className="button button-dark wide" href="/shop">
+            Continue shopping <ArrowRight size={16} />
+          </Link>
+        </div>
       </div>
     </section>
   );

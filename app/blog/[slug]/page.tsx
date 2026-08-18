@@ -9,8 +9,8 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const { slug } = await params;
   const post = blogPosts.find((item) => item.slug === slug);
   return post
-    ? { title: `${post.title} | Aglory Hair and Cosmetics`, description: post.excerpt }
-    : { title: "Beauty Journal | Aglory Hair and Cosmetics" };
+    ? { title: `${post.title} | A-Glory Hair and Cosmetics`, description: post.excerpt }
+    : { title: "Beauty Journal | A-Glory Hair and Cosmetics" };
 }
 export default async function BlogArticlePage({
   params,

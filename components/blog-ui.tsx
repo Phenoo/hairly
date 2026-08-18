@@ -64,7 +64,7 @@ export const blogDetails: Record<string, DetailedBlogPost> = {
     date: "August 12, 2026",
     author: {
       name: "Kemi Adebayo",
-      role: "Master Stylist & Aglory Texture Lead",
+      role: "Master Stylist & A-Glory Texture Lead",
       avatar: "K",
       bio: "Over 12 years of experience in protective styling, knotless braiding, and natural coil preservation across Kent and London.",
     },
@@ -269,7 +269,7 @@ export function BlogIndex() {
           <div className="max-w-3xl">
             <span className="inline-flex items-center gap-2 text-xs uppercase tracking-widest font-semibold text-[#b4865c] bg-[#b4865c]/10 px-3.5 py-1.5 rounded-full border border-[#b4865c]/20 mb-4">
               <Sparkles size={13} className="text-[#b4865c]" />
-              The Aglory Beauty Journal
+              The A-Glory Beauty Journal
             </span>
             <h1 className="font-serif text-4xl sm:text-5xl lg:text-6xl font-medium tracking-tight leading-tight mb-4">
               Beauty wisdom,
@@ -457,7 +457,7 @@ export function BlogIndex() {
                         <span className="text-xs font-semibold text-slate-700">{details.author.name}</span>
                       </div>
                     ) : (
-                      <span className="text-xs text-slate-400 pt-4">Aglory Editorial</span>
+                      <span className="text-xs text-slate-400 pt-4">A-Glory Editorial</span>
                     )}
 
                     <Link
@@ -691,7 +691,7 @@ export function BlogArticle({ slug }: { slug: string }) {
                 <div className="bg-amber-50/80 border border-amber-200/80 rounded-2xl p-5 flex items-start gap-3 text-xs sm:text-sm text-amber-900 shadow-sm">
                   <Sparkles size={20} className="text-[#b4865c] shrink-0 mt-0.5" />
                   <div>
-                    <strong className="font-bold block text-[#12395b] mb-0.5">Aglory Pro Tip</strong>
+                    <strong className="font-bold block text-[#12395b] mb-0.5">A-Glory Pro Tip</strong>
                     <span>{sec.stylistTip}</span>
                   </div>
                 </div>

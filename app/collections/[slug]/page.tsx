@@ -12,8 +12,8 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const { slug } = await params;
   const collection = collections.find((item) => item.slug === slug);
   return collection
-    ? { title: `${collection.name} | Aglory Hair and Cosmetics`, description: collection.description }
-    : { title: "The Aglory Edit | Aglory Hair and Cosmetics" };
+    ? { title: `${collection.name} | A-Glory Hair and Cosmetics`, description: collection.description }
+    : { title: "The A-Glory Edit | A-Glory Hair and Cosmetics" };
 }
 
 export default async function CollectionPage({ params }: { params: Promise<{ slug: string }> }) {
@@ -25,7 +25,7 @@ export default async function CollectionPage({ params }: { params: Promise<{ slu
     <Suspense fallback={<div className="route-page container section-space"><p>Loading collection…</p></div>}>
       <ShopCatalog
         items={items}
-        eyebrow={`The Aglory Edit · ${collection.name}`}
+        eyebrow={`The A-Glory Edit · ${collection.name}`}
         title={<>{collection.name} <em>for your routine.</em></>}
       />
     </Suspense>

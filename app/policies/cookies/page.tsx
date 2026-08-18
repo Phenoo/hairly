@@ -1,6 +1,6 @@
 export const metadata = {
-  title: "Cookie Policy | Aglory Hair and Cosmetics",
-  description: "How Aglory Hair and Cosmetics uses cookies and similar technologies.",
+  title: "Cookie Policy | A-Glory Hair and Cosmetics",
+  description: "How A-Glory Hair and Cosmetics uses cookies and similar technologies.",
 };
 
 export default function CookiesPage() {
