@@ -8,10 +8,10 @@ import {
   Check,
   ChevronDown,
   Heart,
+  HelpCircle,
   PackageCheck,
   Search,
   ShoppingBag,
-  Sparkles,
 } from "lucide-react";
 import type { Product } from "@/lib/store-data";
 import {
@@ -20,12 +20,12 @@ import {
   categories,
   image,
   money,
-  products,
   slugify,
 } from "@/lib/store-data";
-import { ProductGrid } from "@/components/product-card";
+import { ProductGrid, ProductGridSkeleton } from "@/components/product-card";
 import { useStorefront } from "@/lib/storefront-context";
 import { useEffect, useState } from "react";
+import { SkeletonImage } from "@/components/ui/skeleton-image";
 
 export function RouteIntro({
   eyebrow,
@@ -46,15 +46,17 @@ export function RouteIntro({
 }
 
 export function ShopCatalog({
-  items = products,
+  items,
+  pageInfo,
   title = (
     <>
       Shop all <em>beauty.</em>
     </>
   ),
-  eyebrow = "A-Glory catalogue",
+  eyebrow = "Aglory catalogue",
 }: {
-  items?: Product[];
+  items: Product[];
+  pageInfo?: { hasNextPage: boolean; endCursor: string | null };
   title?: React.ReactNode;
   eyebrow?: string;
 }) {
@@ -66,6 +68,9 @@ export function ShopCatalog({
   const [priceFilter, setPriceFilter] = useState("all");
   const [availabilityFilter, setAvailabilityFilter] = useState("all");
   const [optionFilter, setOptionFilter] = useState("all");
+  const [catalogItems, setCatalogItems] = useState(items);
+  const [nextPageInfo, setNextPageInfo] = useState(pageInfo);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
   const filterTypes: Record<string, Product["type"][]> = {
     "Hair care": ["Hair"],
     "Wigs & extensions": ["Wigs"],
@@ -74,18 +79,11 @@ export function ShopCatalog({
     Tools: ["Tools"],
     Men: ["Men"],
   };
-  const filtered = items.filter((product) => {
+  const filtered = catalogItems.filter((product) => {
     const categoryMatches =
       !activeCategory ||
       activeCategory === "All products" ||
       (filterTypes[activeCategory] || []).includes(product.type);
-    const collectionMatches =
-      !activeCollection ||
-      (activeCollection === "new-arrivals"
-        ? ["New", "New arrival", "Just in"].includes(product.tag || "")
-        : activeCollection === "best-sellers"
-          ? ["Bestseller", "Top rated"].includes(product.tag || "")
-          : true);
     const brandMatches = brandFilter === "all" || product.brand === brandFilter;
     const priceMatches =
       priceFilter === "all" ||
@@ -98,7 +96,7 @@ export function ShopCatalog({
       (availabilityFilter === "low-stock" && product.inventory > 0 && product.inventory <= 5);
     const optionMatches =
       optionFilter === "all" || Boolean(product.options?.includes(optionFilter));
-    return categoryMatches && collectionMatches && brandMatches && priceMatches && availabilityMatches && optionMatches;
+    return categoryMatches && brandMatches && priceMatches && availabilityMatches && optionMatches;
   });
   const visibleItems = [...filtered].sort((a, b) =>
     sort === "price-low"
@@ -111,8 +109,8 @@ export function ShopCatalog({
           ? Number(Boolean(b.tag && ["New", "New arrival", "Just in"].includes(b.tag))) - Number(Boolean(a.tag && ["New", "New arrival", "Just in"].includes(a.tag)))
           : 0,
   );
-  const filterBrands = [...new Set(items.map((product) => product.brand))].sort();
-  const filterOptions = [...new Set(items.flatMap((product) => product.options || []))].sort();
+  const filterBrands = [...new Set(catalogItems.map((product) => product.brand))].sort();
+  const filterOptions = [...new Set(catalogItems.flatMap((product) => product.options || []))].sort();
   const hasExtraFilters = [brandFilter, priceFilter, availabilityFilter, optionFilter].some((value) => value !== "all");
   const filterUrl = (filter: string) =>
     filter === "All products"
@@ -239,16 +237,35 @@ export function ShopCatalog({
         <div className="utility-card">
           <Search size={25} />
           <h2>No products in this view.</h2>
-          <p>Try another category or browse all of A-Glory.</p>
+          <p>Try another category or browse all of Aglory.</p>
           <Link className="button button-outline" href="/shop">
             View all products
           </Link>
         </div>
       )}
+      {isLoadingMore && (
+        <div className="mt-8">
+          <ProductGridSkeleton count={4} />
+        </div>
+      )}
+      {nextPageInfo?.hasNextPage && nextPageInfo.endCursor && !activeCategory && !activeCollection && !hasExtraFilters && (
+        <div className="mt-8 flex justify-center">
+          <button type="button" className="button button-outline" disabled={isLoadingMore} onClick={() => {
+            setIsLoadingMore(true);
+            void fetch(`/api/products?after=${encodeURIComponent(nextPageInfo.endCursor!)}`).then(async (response) => {
+              if (!response.ok) throw new Error("Unable to load more products.");
+              return response.json() as Promise<{ products: Product[]; pageInfo: { hasNextPage: boolean; endCursor: string | null } }>;
+            }).then((page) => {
+              setCatalogItems((current) => [...current, ...page.products]);
+              setNextPageInfo(page.pageInfo);
+            }).catch(() => undefined).finally(() => setIsLoadingMore(false));
+          }}>{isLoadingMore ? "Loading more…" : "Load more products"}</button>
+        </div>
+      )}
       <div className="shop-guide">
         <div>
           <span>
-            <strong>Need a little help?</strong> Speak with the A-Glory team on
+            <strong>Need a little help?</strong> Speak with the Aglory team on
             WhatsApp and we’ll help you choose.
           </span>
         </div>
@@ -269,7 +286,7 @@ export function BrandsIndex() {
   return (
     <section className="route-page brands-page container section-space">
       <RouteIntro
-        eyebrow="The A-Glory index"
+        eyebrow="The Aglory index"
         title={
           <>
             Brands with <em>intention.</em>
@@ -293,9 +310,12 @@ export function BrandsIndex() {
             Shop Shea Moisture <ArrowRight size={16} />
           </Link>
         </div>
-        <img
+        <SkeletonImage
           src={image("photo-1556229010-6c3f2c9ca5f8", 1000)}
           alt="Shea Moisture body care"
+          width={600}
+          height={600}
+          containerClassName="brand-hero-img-wrap w-full h-full min-h-[360px]"
         />
       </div>
       <div className="brand-index">
@@ -331,6 +351,7 @@ export function BrandsIndex() {
 }
 
 export function FinderPage({ kind }: { kind: "hair" | "beauty" }) {
+  const { catalog: products } = useStorefront();
   const hair = kind === "hair";
   const [step, setStep] = useState(1);
   const [selection, setSelection] = useState("");
@@ -458,7 +479,7 @@ export function BlogIndex() {
   return (
     <section className="route-page container section-space">
       <RouteIntro
-        eyebrow="The A-Glory Blog"
+        eyebrow="The Aglory Blog"
         title={
           <>
             Beauty wisdom
@@ -475,7 +496,13 @@ export function BlogIndex() {
             href={`/blog/${post.slug}`}
             key={post.slug}
           >
-            <img src={post.image} alt="" />
+            <SkeletonImage
+              src={post.image}
+              alt={post.title}
+              width={720}
+              height={460}
+              containerClassName="w-full aspect-[720/460]"
+            />
             <div className="blog-card-copy">
               <span className="eyebrow">
                 {post.category} / {post.read}
@@ -502,7 +529,14 @@ export function BlogArticle({ slug }: { slug: string }) {
         title={<>{post.title}</>}
         body={post.excerpt}
       />
-      <img className="article-hero" src={post.image} alt="" />
+      <SkeletonImage
+        src={post.image}
+        alt={post.title}
+        width={1200}
+        height={600}
+        priority
+        containerClassName="article-hero w-full aspect-[2/1] min-h-[300px]"
+      />
       <div className="article-body">
         <p>
           {post.excerpt} Beauty is personal, so the best routine is the one that
@@ -522,7 +556,7 @@ export function BlogArticle({ slug }: { slug: string }) {
         <ul>
           <li>Consistency matters more than complexity.</li>
           <li>Choose products that suit your texture and lifestyle.</li>
-          <li>Ask for advice when you need it — A-Glory is here to help.</li>
+          <li>Ask for advice when you need it — Aglory is here to help.</li>
         </ul>
         <Link className="button button-dark" href="/shop">
           Shop beauty <ArrowRight size={16} />
@@ -591,7 +625,7 @@ export function AccountPage() {
           <Heart size={18} /> Wishlist <ArrowRight size={15} />
         </Link>
         <Link href="/contact">
-          <Sparkles size={18} /> Need help? <ArrowRight size={15} />
+          <HelpCircle size={18} /> Need help? <ArrowRight size={15} />
         </Link>
       </div>
     </section>
@@ -610,7 +644,7 @@ export function ContactPage() {
         </h1>
         <p>
           Questions about a product, your next style or a same-day delivery? The
-          A-Glory team is here.
+          Aglory team is here.
         </p>
         <div className="contact-details">
           <a href="tel:01322333305">
@@ -632,7 +666,7 @@ export function ContactPage() {
         </div>
         <div className="contact-store-card">
           <span className="eyebrow">Visit the store</span>
-          <strong>A-Glory Hair and Cosmetics</strong>
+          <strong>Aglory Hair and Cosmetics</strong>
           <p>8 Cross Street, Erith, Kent DA8 1RB</p>
           <p>Mon–Sat 9am–7pm · Sun 11am–4pm</p>
           <a
@@ -654,14 +688,14 @@ export function ContactPage() {
         </h2>
         <p>
           The website contact form stays offline until it is connected to the
-          A-Glory inbox. Call, WhatsApp or email the store directly in the meantime.
+          Aglory inbox. Call, WhatsApp or email the store directly in the meantime.
         </p>
         <div className="contact-direct-actions">
           <a className="button button-dark wide" href="https://wa.me/447446841404" target="_blank" rel="noreferrer">
             WhatsApp the team <ArrowUpRight size={16} />
           </a>
           <a className="button button-outline wide" href="mailto:agloryltd@aol.com">
-            Email A-Glory <ArrowRight size={16} />
+            Email Aglory <ArrowRight size={16} />
           </a>
           <a className="text-button" href="tel:01322333305">Call 01322 333305</a>
         </div>
@@ -689,7 +723,7 @@ export function UtilityPage({
           <Check size={25} />
           <h2>You’re all set.</h2>
           <p>
-            Use the links above to continue shopping or get help from the A-Glory
+            Use the links above to continue shopping or get help from the Aglory
             team.
           </p>
           <Link className="button button-dark" href="/shop">
@@ -706,7 +740,7 @@ export function CartSummary() {
 }
 
 export function CartPage() {
-  const { cart, cartTotal, changeQuantity, removeFromCart } = useStorefront();
+  const { cart, cartTotal, cartCurrency, changeQuantity, removeFromCart, checkoutUrl, cartError, isCartUpdating, beginCheckout } = useStorefront();
   if (!cart.length)
     return (
       <div className="utility-card cart-summary">
@@ -724,28 +758,32 @@ export function CartPage() {
         {cart.map((line) => (
           <div
             className="cart-page-line"
-            key={`${line.product.id}-${line.option}`}
+            key={line.id}
           >
-            <img src={line.product.image} alt="" />
+            <SkeletonImage
+              src={line.product.image}
+              alt={line.product.name}
+              width={80}
+              height={80}
+              containerClassName="size-20 shrink-0 rounded-md overflow-hidden"
+            />
             <div>
               <span className="eyebrow">{line.product.brand}</span>
               <h3>{line.product.name}</h3>
-              {line.option && <small>{line.option}</small>}
+              {line.variantTitle && <small>{line.variantTitle}</small>}
               <div className="cart-page-controls">
                 <div className="quantity">
                   <button
-                    onClick={() =>
-                      changeQuantity(line.product.id, -1, line.option)
-                    }
+                    onClick={() => void changeQuantity(line.id, line.quantity - 1).catch(() => undefined)}
+                    disabled={isCartUpdating}
                     aria-label="Decrease quantity"
                   >
                     −
                   </button>
                   <span>{line.quantity}</span>
                   <button
-                    onClick={() =>
-                      changeQuantity(line.product.id, 1, line.option)
-                    }
+                    onClick={() => void changeQuantity(line.id, line.quantity + 1).catch(() => undefined)}
+                    disabled={isCartUpdating}
                     aria-label="Increase quantity"
                   >
                     +
@@ -753,23 +791,32 @@ export function CartPage() {
                 </div>
                 <button
                   className="text-button"
-                  onClick={() => removeFromCart(line.product.id, line.option)}
+                  onClick={() => void removeFromCart(line.id).catch(() => undefined)}
+                  disabled={isCartUpdating}
                 >
                   Remove
                 </button>
               </div>
             </div>
-            <strong>{money(line.product.price * line.quantity)}</strong>
+            <strong>{money(line.unitPrice.amount * line.quantity, line.unitPrice.currencyCode)}</strong>
           </div>
         ))}
       </div>
       <div className="cart-page-total">
         <span>Subtotal</span>
-        <strong>{money(cartTotal)}</strong>
-        <small>Stock, delivery and payment are confirmed by the store team.</small>
-        <Link className="button button-dark" href="/checkout">
-          Complete with the store <ArrowRight size={16} />
-        </Link>
+        <strong>{money(cartTotal, cartCurrency)}</strong>
+        <small>Taxes, delivery options and payment are confirmed securely by Shopify at checkout.</small>
+        {cartError && <small role="alert">{cartError}</small>}
+        {checkoutUrl ? (
+          <a className="button button-dark" href={checkoutUrl} onClick={(event) => {
+            event.preventDefault();
+            void beginCheckout().then((url) => { if (url) window.location.assign(url); }).catch(() => undefined);
+          }}>
+            Secure checkout <ArrowRight size={16} />
+          </a>
+        ) : (
+          <span className="button button-dark" aria-disabled="true">Preparing checkout…</span>
+        )}
       </div>
     </div>
   );
@@ -805,8 +852,14 @@ export function WishlistPage() {
 }
 
 export function SearchPage() {
+  const { catalog: initialCatalog } = useStorefront();
   const searchParams = useSearchParams();
   const [query, setQuery] = useState(searchParams.get("q") || "");
+  const [products, setProducts] = useState<Product[]>(initialCatalog);
+  const [pageInfo, setPageInfo] = useState<{ hasNextPage: boolean; endCursor: string | null }>({ hasNextPage: false, endCursor: null });
+  const [isLoading, setIsLoading] = useState(Boolean(searchParams.get("q")));
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [searchError, setSearchError] = useState<string>();
   const [recentSearches, setRecentSearches] = useState<string[]>([]);
   useEffect(() => {
     const loadRecentSearches = window.setTimeout(() => {
@@ -818,7 +871,41 @@ export function SearchPage() {
     }, 0);
     return () => window.clearTimeout(loadRecentSearches);
   }, []);
+  useEffect(() => {
+    const nextQuery = searchParams.get("q") || "";
+    const syncQuery = window.setTimeout(() => setQuery(nextQuery), 0);
+    return () => window.clearTimeout(syncQuery);
+  }, [searchParams]);
   const normalized = query.trim().toLowerCase();
+  useEffect(() => {
+    const controller = new AbortController();
+    const request = window.setTimeout(() => {
+      setIsLoading(true);
+      setSearchError(undefined);
+      const params = new URLSearchParams({ first: "24" });
+      if (normalized) params.set("q", normalized);
+      void fetch(`/api/products?${params.toString()}`, { signal: controller.signal, cache: "no-store" })
+        .then(async (response) => {
+          if (!response.ok) throw new Error("Search is temporarily unavailable.");
+          return response.json() as Promise<{ products: Product[]; pageInfo: { hasNextPage: boolean; endCursor: string | null } }>;
+        })
+        .then((page) => {
+          setProducts(page.products);
+          setPageInfo(page.pageInfo);
+        })
+        .catch((error: unknown) => {
+          if (error instanceof DOMException && error.name === "AbortError") return;
+          setSearchError(error instanceof Error ? error.message : "Search is temporarily unavailable.");
+        })
+        .finally(() => {
+          if (!controller.signal.aborted) setIsLoading(false);
+        });
+    }, 220);
+    return () => {
+      window.clearTimeout(request);
+      controller.abort();
+    };
+  }, [normalized]);
   const searchable = (product: Product) =>
     `${product.brand} ${product.name} ${product.category} ${product.type} ${product.description}`.toLowerCase();
   const results = products.filter(
@@ -841,6 +928,7 @@ export function SearchPage() {
   const popularSearches = ["Shea Moisture", "foundation", "hair care", "wigs"];
   const chooseSearch = (term: string) => {
     setQuery(term);
+    setIsLoading(true);
     const next = [term, ...recentSearches.filter((item) => item.toLowerCase() !== term.toLowerCase())].slice(0, 5);
     setRecentSearches(next);
     try {
@@ -865,7 +953,10 @@ export function SearchPage() {
         <input
           autoFocus
           value={query}
-            onChange={(event) => setQuery(event.target.value)}
+          onChange={(event) => {
+            setQuery(event.target.value);
+            if (event.target.value.trim()) setIsLoading(true);
+          }}
           onKeyDown={(event) => {
             if (event.key === "Enter" && query.trim()) chooseSearch(query.trim());
           }}
@@ -910,7 +1001,13 @@ export function SearchPage() {
               <span className="eyebrow">Products</span>
               {liveResults.map((product) => (
                 <Link href={`/products/${product.slug}`} key={product.id}>
-                  <img src={product.image} alt="" />
+                  <SkeletonImage
+                    src={product.image}
+                    alt={product.name}
+                    width={48}
+                    height={48}
+                    containerClassName="size-12 shrink-0 rounded-md overflow-hidden"
+                  />
                   <span><small>{product.brand}</small>{product.name}</span>
                   <strong>{money(product.price)}</strong>
                 </Link>
@@ -940,8 +1037,12 @@ export function SearchPage() {
             ? `${results.length} result${results.length === 1 ? "" : "s"}`
             : "All products"}
         </span>
+        {isLoading && <span className="muted">Searching…</span>}
+        {searchError && <span className="muted" role="alert">{searchError}</span>}
       </div>
-      {results.length ? (
+      {isLoading ? (
+        <ProductGridSkeleton count={8} />
+      ) : results.length ? (
         <ProductGrid items={results} />
       ) : (
         <div className="utility-card">
@@ -956,12 +1057,44 @@ export function SearchPage() {
           </button>
         </div>
       )}
+      {isLoadingMore && (
+        <div className="mt-8">
+          <ProductGridSkeleton count={4} />
+        </div>
+      )}
+      {pageInfo.hasNextPage && pageInfo.endCursor && !isLoading && (
+        <div className="mt-8 flex justify-center">
+          <button
+            type="button"
+            className="button button-outline"
+            disabled={isLoadingMore}
+            onClick={() => {
+              setIsLoadingMore(true);
+              const params = new URLSearchParams({ first: "24", after: pageInfo.endCursor! });
+              if (normalized) params.set("q", normalized);
+              void fetch(`/api/products?${params.toString()}`, { cache: "no-store" })
+                .then(async (response) => {
+                  if (!response.ok) throw new Error("Unable to load more products.");
+                  return response.json() as Promise<{ products: Product[]; pageInfo: { hasNextPage: boolean; endCursor: string | null } }>;
+                })
+                .then((page) => {
+                  setProducts((current) => [...current, ...page.products]);
+                  setPageInfo(page.pageInfo);
+                })
+                .catch((error: unknown) => setSearchError(error instanceof Error ? error.message : "Unable to load more products."))
+                .finally(() => setIsLoadingMore(false));
+            }}
+          >
+            {isLoadingMore ? "Loading more…" : "Load more products"} <ArrowRight size={16} />
+          </button>
+        </div>
+      )}
     </section>
   );
 }
 
 export function CheckoutPage() {
-  const { cart, cartTotal } = useStorefront();
+  const { cart, cartTotal, cartCurrency, checkoutUrl, beginCheckout } = useStorefront();
   if (!cart.length)
     return (
       <section className="utility-page container section-space">
@@ -985,40 +1118,38 @@ export function CheckoutPage() {
       <RouteIntro
         eyebrow="Order support"
         title={<>Your bag is <em>ready.</em></>}
-        body="Online payment is not connected yet. Your bag is saved on this device, and the A-Glory store team can confirm stock, delivery and payment."
+        body="Your order is ready to complete through Aglory’s secure Shopify checkout."
       />
       <div className="checkout-handoff">
         <div className="checkout-fields">
-          <span className="eyebrow">Complete your order with the store</span>
-          <h2>Speak with A-Glory before paying.</h2>
+          <span className="eyebrow">Secure Shopify checkout</span>
+          <h2>Complete your order securely.</h2>
           <p>
-            We have removed the preview payment form so the site never implies
-            that money or personal details have been processed when they have not.
+            Shipping, collection options, taxes and payment are handled securely
+            by Shopify. You will return to Aglory after your order is complete.
           </p>
           <div className="checkout-contact-actions">
-            <a className="button button-dark" href="https://wa.me/447446841404" target="_blank" rel="noreferrer">
-              WhatsApp the store <ArrowUpRight size={16} />
-            </a>
+            {checkoutUrl && <a className="button button-dark" href={checkoutUrl} onClick={(event) => { event.preventDefault(); void beginCheckout().then((url) => { if (url) window.location.assign(url); }).catch(() => undefined); }}>Continue to secure checkout <ArrowRight size={16} /></a>}
             <a className="button button-outline" href="tel:01322333305">
               Call 01322 333305
             </a>
           </div>
           <div className="checkout-assurance">
             <span><PackageCheck size={17} /> Delivery and collection are confirmed against current stock.</span>
-            <span><Check size={17} /> No payment details are collected on this website yet.</span>
+            <span><Check size={17} /> Payment details are collected securely by Shopify.</span>
           </div>
         </div>
         <aside className="checkout-order">
           <span className="eyebrow">Bag summary</span>
           {cart.map((line) => (
-            <div className="checkout-order-line" key={`${line.product.id}-${line.option}`}>
+            <div className="checkout-order-line" key={line.id}>
               <span>{line.product.name} × {line.quantity}</span>
-              <strong>{money(line.product.price * line.quantity)}</strong>
+              <strong>{money(line.unitPrice.amount * line.quantity, line.unitPrice.currencyCode)}</strong>
             </div>
           ))}
           <div className="checkout-order-total">
             <span>Subtotal</span>
-            <strong>{money(cartTotal)}</strong>
+            <strong>{money(cartTotal, cartCurrency)}</strong>
           </div>
           <small className="checkout-demo-note">
             Delivery charges are confirmed by the store team.

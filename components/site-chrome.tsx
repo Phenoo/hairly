@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import {
   ArrowUpRight,
   ChevronRight,
@@ -11,11 +12,20 @@ import {
   UserRound,
   X,
 } from "lucide-react";
-import { FaWhatsapp } from "react-icons/fa6";
+import {
+  FaFacebookF,
+  FaInstagram,
+  FaPinterestP,
+  FaTiktok,
+  FaWhatsapp,
+  FaYoutube,
+} from "react-icons/fa6";
 import { useEffect, useState } from "react";
 import { useStorefront } from "@/lib/storefront-context";
 import { categories } from "@/lib/store-data";
 import { HeaderSearch } from "@/components/header-search";
+import { CartDrawer } from "@/components/cart-drawer";
+import { StoreAdvisorWidget } from "@/components/store-advisor-widget";
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -67,8 +77,7 @@ const megaMenuGroups = [
 export function SiteChrome({ children }: { children: React.ReactNode }) {
   const [mobileNav, setMobileNav] = useState(false);
   const [headerVisible, setHeaderVisible] = useState(true);
-  const [atTop, setAtTop] = useState(true);
-  const { cartCount, wishlist } = useStorefront();
+  const { cartCount, wishlist, openCart } = useStorefront();
   useEffect(() => {
     let previousScrollY = window.scrollY;
     let frame = 0;
@@ -76,7 +85,6 @@ export function SiteChrome({ children }: { children: React.ReactNode }) {
       if (frame) return;
       frame = window.requestAnimationFrame(() => {
         const currentScrollY = window.scrollY;
-        setAtTop(currentScrollY < 24);
         setHeaderVisible(currentScrollY < 24 || currentScrollY < previousScrollY);
         previousScrollY = currentScrollY;
         frame = 0;
@@ -118,7 +126,7 @@ export function SiteChrome({ children }: { children: React.ReactNode }) {
             href="https://wa.me/447446841404"
             target="_blank"
             rel="noreferrer"
-            aria-label="Contact A-Glory on WhatsApp"
+            aria-label="Contact Aglory on WhatsApp"
           >
             <FaWhatsapp size={13} />
             <span>WhatsApp</span>
@@ -127,7 +135,7 @@ export function SiteChrome({ children }: { children: React.ReactNode }) {
       </div>
       <div className="site-header-spacer" aria-hidden="true" />
       <header
-        className={`site-header ${headerVisible || mobileNav ? "is-visible" : "is-hidden"} ${atTop ? "is-at-top" : "is-scrolled"}`}
+        className={`site-header ${headerVisible || mobileNav ? "is-visible" : "is-hidden"} ${"is-scrolled"}`}
       >
         <div className="header-main container">
           <button
@@ -138,11 +146,17 @@ export function SiteChrome({ children }: { children: React.ReactNode }) {
             <Menu size={21} />
           </button>
           <Link
-            className="logo"
+            className="logo brand-logo-link"
             href="/"
-            aria-label="A-Glory Hair and Cosmetics home"
+            aria-label="Aglory Hair and Cosmetics home"
           >
-            <span>ag</span>lory
+             <Image
+                src="/aglory-logo-white.png"
+                alt="Aglory Hair & Cosmetics"
+                width={188}
+                height={50}
+                className="site-logo-img site-logo-white"
+              />
           </Link>
           <HeaderSearch />
           <nav className="desktop-nav" aria-label="Main navigation">
@@ -194,10 +208,15 @@ export function SiteChrome({ children }: { children: React.ReactNode }) {
               <span className="hide-small">Wishlist</span>
               {wishlist.length > 0 && <b>{wishlist.length}</b>}
             </Link>
-            <Link className="bag-button" href="/cart" aria-label="Shopping bag">
+            <button
+              type="button"
+              className="bag-button"
+              onClick={openCart}
+              aria-label="Open shopping bag"
+            >
               <ShoppingBag size={20} />
               <span className="bag-count">{cartCount}</span>
-            </Link>
+            </button>
           </div>
         </div>
       </header>
@@ -215,13 +234,20 @@ export function SiteChrome({ children }: { children: React.ReactNode }) {
           >
             <div className="mobile-nav-top">
               <div>
-                <span className="mobile-nav-label">A-Glory menu</span>
+                <span className="mobile-nav-label">Aglory menu</span>
                 <Link
-                  className="logo"
+                  className="logo brand-logo-link"
                   href="/"
                   onClick={() => setMobileNav(false)}
+                  aria-label="Aglory Hair and Cosmetics home"
                 >
-                  <span>ag</span>lory
+                  <Image
+                    src="/aglory-logo.png"
+                    alt="Aglory Hair & Cosmetics"
+                    width={160}
+                    height={43}
+                    className="site-logo-img"
+                  />
                 </Link>
               </div>
               <button
@@ -231,9 +257,6 @@ export function SiteChrome({ children }: { children: React.ReactNode }) {
               >
                 <X size={21} />
               </button>
-            </div>
-            <div className="mobile-nav-intro">
-              <HeaderSearch onNavigate={() => setMobileNav(false)} />
             </div>
             <nav className="mobile-nav-links" aria-label="Mobile menu links">
               <Link
@@ -343,15 +366,70 @@ function SiteFooter() {
       <footer className="site-footer font-medium">
         <div className="container footer-main">
           <div className="footer-brand">
-            <Link className="logo" href="/">
-              <span>ag</span>lory
+            <Link
+              className="logo brand-logo-link footer-logo-link"
+              href="/"
+              aria-label="Aglory Hair and Cosmetics home"
+            >
+              <Image
+                src="/aglory-logo-white.png"
+                alt="Aglory Hair & Cosmetics"
+                width={188}
+                height={50}
+                className="site-logo-img site-logo-white"
+              />
             </Link>
             <p className="font-medium">
               The destination for beauty that understands you.
             </p>
-            <div className="socials">
-              <a href="https://wa.me/447446841404" aria-label="WhatsApp A-Glory">
-                <FaWhatsapp />
+            <div className="socials" aria-label="Social media links">
+              <a
+                href="https://www.instagram.com/agloryhairandcosmetics"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Aglory on Instagram"
+              >
+                <FaInstagram size={15} />
+              </a>
+              <a
+                href="https://www.tiktok.com/@agloryhair"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Aglory on TikTok"
+              >
+                <FaTiktok size={14} />
+              </a>
+              <a
+                href="https://www.facebook.com/agloryhairandcosmetics"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Aglory on Facebook"
+              >
+                <FaFacebookF size={14} />
+              </a>
+              <a
+                href="https://wa.me/447446841404"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="WhatsApp Aglory"
+              >
+                <FaWhatsapp size={15} />
+              </a>
+              <a
+                href="https://www.youtube.com/@agloryhairandcosmetics"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Aglory on YouTube"
+              >
+                <FaYoutube size={15} />
+              </a>
+              <a
+                href="https://www.pinterest.com/agloryhair"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Aglory on Pinterest"
+              >
+                <FaPinterestP size={14} />
               </a>
             </div>
           </div>
@@ -403,7 +481,7 @@ function SiteFooter() {
           <div className="footer-col footer-visit">
             <span className="font-bold">Visit us</span>
             <p className="font-semibold">
-              A-Glory Hair and Cosmetics
+              Aglory Hair and Cosmetics
               <br />8 Cross Street
               <br />
               Erith, Kent DA8 1RB
@@ -420,7 +498,7 @@ function SiteFooter() {
           </div>
         </div>
         <div className="container footer-bottom font-semibold">
-          <span>© 2026 A-Glory Hair and Cosmetics</span>
+          <span>© 2026 Aglory Hair and Cosmetics</span>
           <span>Beauty, culture, confidence.</span>
           <span>
             <Link className="font-bold" href="/policies/privacy">
@@ -437,18 +515,8 @@ function SiteFooter() {
           </span>
         </div>
       </footer>
-      <a
-        className="whatsapp-float font-bold"
-        href="https://wa.me/447446841404"
-        target="_blank"
-        rel="noreferrer"
-        aria-label="Message A-Glory Hair and Cosmetics on WhatsApp"
-      >
-        <span>
-          <FaWhatsapp size={18} />
-        </span>
-        <small className="font-bold">Message us on WhatsApp</small>
-      </a>{" "}
+      <CartDrawer />
+      <StoreAdvisorWidget />
     </>
   );
 }

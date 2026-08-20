@@ -1,5 +1,5 @@
 const marqueeItems = [
-  "A-Glory Hair and Cosmetics",
+  "Aglory Hair and Cosmetics",
   "Beauty made brilliantly personal",
   "Hair · Skin · Makeup",
   "Curated in Erith",
@@ -8,7 +8,7 @@ const marqueeItems = [
 
 export function BrandMarquee() {
   return (
-    <section className="brand-marquee" aria-label="A-Glory highlights">
+    <section className="brand-marquee" aria-label="Aglory highlights">
       <div className="marquee-track">
         {[0, 1].map((copy) => (
           <div className="marquee-group" aria-hidden={copy === 1} key={copy}>

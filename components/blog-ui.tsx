@@ -7,12 +7,9 @@ import {
   ArrowUpRight,
   Calendar,
   Clock,
-  Share2,
-  Bookmark,
   Check,
   Copy,
-  Sparkles,
-  User,
+  Lightbulb,
   Search,
   MessageCircle,
   ChevronRight,
@@ -21,8 +18,8 @@ import {
   Tag,
   CheckCircle2,
 } from "lucide-react";
-import { blogPosts, products, getProduct, image, Product, money } from "@/lib/store-data";
-import { ProductCard } from "@/components/product-card";
+import { blogPosts, products, image, Product, money } from "@/lib/store-data";
+import { SkeletonImage } from "@/components/ui/skeleton-image";
 
 // Expanded Blog Data with rich content for each article
 export interface DetailedBlogPost {
@@ -64,7 +61,7 @@ export const blogDetails: Record<string, DetailedBlogPost> = {
     date: "August 12, 2026",
     author: {
       name: "Kemi Adebayo",
-      role: "Master Stylist & A-Glory Texture Lead",
+      role: "Master Stylist & Aglory Texture Lead",
       avatar: "K",
       bio: "Over 12 years of experience in protective styling, knotless braiding, and natural coil preservation across Kent and London.",
     },
@@ -268,8 +265,8 @@ export function BlogIndex() {
         <div className="container mx-auto px-4 lg:px-8 relative z-10">
           <div className="max-w-3xl">
             <span className="inline-flex items-center gap-2 text-xs uppercase tracking-widest font-semibold text-[#b4865c] bg-[#b4865c]/10 px-3.5 py-1.5 rounded-full border border-[#b4865c]/20 mb-4">
-              <Sparkles size={13} className="text-[#b4865c]" />
-              The A-Glory Beauty Journal
+              <BookOpen size={13} className="text-[#b4865c]" />
+              The Aglory Beauty Journal
             </span>
             <h1 className="font-serif text-4xl sm:text-5xl lg:text-6xl font-medium tracking-tight leading-tight mb-4">
               Beauty wisdom,
@@ -328,10 +325,14 @@ export function BlogIndex() {
 
               <div className="lg:col-span-5">
                 <Link href={`/blog/${featuredPost.slug}`} className="block overflow-hidden rounded-2xl border border-white/10 group">
-                  <img
+                  <SkeletonImage
                     src={featuredPost.image}
                     alt={featuredPost.title}
-                    className="w-full h-64 sm:h-72 object-cover group-hover:scale-105 transition-transform duration-500"
+                    width={800}
+                    height={480}
+                    priority
+                    containerClassName="w-full h-64 sm:h-72"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   />
                 </Link>
               </div>
@@ -402,12 +403,15 @@ export function BlogIndex() {
                   <div>
                     {/* Image */}
                     <div className="relative overflow-hidden h-52">
-                      <img
+                      <SkeletonImage
                         src={post.image}
                         alt={post.title}
+                        width={600}
+                        height={400}
+                        containerClassName="w-full h-full"
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                       />
-                      <span className="absolute top-3 left-3 bg-[#0d2d4b]/80 backdrop-blur-sm text-white text-[11px] font-semibold px-3 py-1 rounded-full">
+                      <span className="absolute top-3 left-3 z-10 bg-[#0d2d4b]/80 backdrop-blur-sm text-white text-[11px] font-semibold px-3 py-1 rounded-full">
                         {post.category}
                       </span>
                       <button
@@ -457,7 +461,7 @@ export function BlogIndex() {
                         <span className="text-xs font-semibold text-slate-700">{details.author.name}</span>
                       </div>
                     ) : (
-                      <span className="text-xs text-slate-400 pt-4">A-Glory Editorial</span>
+                      <span className="text-xs text-slate-400 pt-4">Aglory Editorial</span>
                     )}
 
                     <Link
@@ -616,10 +620,14 @@ export function BlogArticle({ slug }: { slug: string }) {
       {/* Main Image Frame */}
       <div className="container mx-auto px-4 lg:px-8 max-w-4xl -mt-10 relative z-20">
         <div className="rounded-3xl overflow-hidden shadow-2xl border-4 border-white bg-white">
-          <img
+          <SkeletonImage
             src={details.image}
             alt={details.title}
-            className="w-full h-80 sm:h-[450px] object-cover"
+            width={1200}
+            height={675}
+            priority
+            containerClassName="w-full h-80 sm:h-[450px]"
+            className="w-full h-full object-cover"
           />
         </div>
       </div>
@@ -689,9 +697,9 @@ export function BlogArticle({ slug }: { slug: string }) {
               {/* Stylist Tip Box */}
               {sec.stylistTip && (
                 <div className="bg-amber-50/80 border border-amber-200/80 rounded-2xl p-5 flex items-start gap-3 text-xs sm:text-sm text-amber-900 shadow-sm">
-                  <Sparkles size={20} className="text-[#b4865c] shrink-0 mt-0.5" />
+                  <Lightbulb size={20} className="text-[#b4865c] shrink-0 mt-0.5" />
                   <div>
-                    <strong className="font-bold block text-[#12395b] mb-0.5">A-Glory Pro Tip</strong>
+                    <strong className="font-bold block text-[#12395b] mb-0.5">Aglory Pro Tip</strong>
                     <span>{sec.stylistTip}</span>
                   </div>
                 </div>
@@ -733,7 +741,14 @@ export function BlogArticle({ slug }: { slug: string }) {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {recommendedProducts.map((prod) => (
                   <div key={prod.id} className="border border-slate-200 rounded-2xl p-4 flex gap-4 items-center bg-slate-50/50 hover:bg-white transition">
-                    <img src={prod.image} alt={prod.name} className="w-16 h-16 object-cover rounded-xl border shrink-0" />
+                    <SkeletonImage
+                      src={prod.image}
+                      alt={prod.name}
+                      width={64}
+                      height={64}
+                      containerClassName="w-16 h-16 rounded-xl border shrink-0 overflow-hidden"
+                      className="w-full h-full object-cover"
+                    />
                     <div className="flex-1 min-w-0">
                       <span className="text-[10px] font-bold uppercase text-[#b4865c]">{prod.brand}</span>
                       <strong className="block text-xs font-bold text-[#12395b] truncate">{prod.name}</strong>
@@ -775,7 +790,14 @@ export function BlogArticle({ slug }: { slug: string }) {
                     href={`/blog/${rPost.slug}`}
                     className="bg-white border border-slate-200 rounded-2xl p-4 flex gap-3 items-center hover:shadow-md transition group"
                   >
-                    <img src={rPost.image} alt={rPost.title} className="w-16 h-16 object-cover rounded-xl shrink-0" />
+                    <SkeletonImage
+                      src={rPost.image}
+                      alt={rPost.title}
+                      width={64}
+                      height={64}
+                      containerClassName="w-16 h-16 rounded-xl shrink-0 overflow-hidden"
+                      className="w-full h-full object-cover"
+                    />
                     <div className="min-w-0">
                       <span className="text-[10px] uppercase font-bold text-[#b4865c]">{rPost.category}</span>
                       <strong className="block text-xs font-bold text-[#12395b] group-hover:text-[#b4865c] transition-colors truncate">

@@ -1,6 +1,6 @@
 import { UtilityPage } from "@/components/route-ui";
 
-export const metadata = { title: "Privacy | A-Glory Hair and Cosmetics" };
+export const metadata = { title: "Privacy | Aglory Hair and Cosmetics" };
 
 export default function PrivacyRoute() {
   return (
@@ -11,7 +11,7 @@ export default function PrivacyRoute() {
           Privacy, made <em>clear.</em>
         </>
       }
-      body="A short, plain-language overview of how A-Glory handles information shared through this website."
+      body="A short, plain-language overview of how Aglory handles information shared through this website."
     >
       <div className="policy-grid">
         <section>

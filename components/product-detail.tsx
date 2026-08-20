@@ -1,17 +1,45 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { ArrowRight, Check, ChevronRight, Heart, MapPin, ShoppingBag } from "lucide-react";
 import type { Product } from "@/lib/store-data";
-import { categorySlug, money, products } from "@/lib/store-data";
+import { categorySlug, money } from "@/lib/store-data";
 import { useStorefront } from "@/lib/storefront-context";
 import { ProductGrid } from "@/components/product-card";
+import { DeliveryTimer, TrustPerks } from "@/components/delivery-timer";
+import { FrequentlyBoughtTogether } from "@/components/frequently-bought-together";
+import { RecentlyViewedSection, RecentlyViewedTracker } from "@/components/recently-viewed";
+import { trackCommerceEvent } from "@/lib/analytics";
+import { SkeletonImage } from "@/components/ui/skeleton-image";
+
 export function ProductDetail({ product }: { product: Product }) {
-  const [option, setOption] = useState("");
+  const [selectedOptions, setSelectedOptions] = useState<Record<string, string>>({});
   const [quantity, setQuantity] = useState(1);
   const [added, setAdded] = useState(false);
-  const { addToCart, wishlist, toggleWishlist } = useStorefront();
+  const { addToCart, wishlist, toggleWishlist, catalog, isCartUpdating, cartError } = useStorefront();
+  const viewedProductRef = useRef<string | undefined>(undefined);
+  const optionGroups = useMemo(() => product.optionGroups ?? [], [product.optionGroups]);
+  const selectedVariant = useMemo(() => {
+    if (!product.variants?.length) return undefined;
+    if (!optionGroups.length) return product.variants.find((variant) => variant.id === product.defaultVariantId) || product.variants[0];
+    if (optionGroups.some((group) => !selectedOptions[group.name])) return undefined;
+    return product.variants.find((variant) => optionGroups.every((group) => variant.selectedOptions.some((option) => option.name === group.name && option.value === selectedOptions[group.name])));
+  }, [optionGroups, product.defaultVariantId, product.variants, selectedOptions]);
+  const displayVariant = selectedVariant || (!optionGroups.length ? product.variants?.find((variant) => variant.id === product.defaultVariantId) : undefined);
+  const isValueAvailable = (name: string, value: string) => product.variants?.some((variant) =>
+    variant.availableForSale && variant.selectedOptions.some((option) => option.name === name && option.value === value) &&
+    Object.entries(selectedOptions).every(([selectedName, selectedValue]) => selectedName === name || variant.selectedOptions.some((option) => option.name === selectedName && option.value === selectedValue)),
+  ) || false;
+  const canAdd = Boolean(selectedVariant?.availableForSale || (!optionGroups.length && displayVariant?.availableForSale));
+  useEffect(() => {
+    if (viewedProductRef.current === product.id) return;
+    viewedProductRef.current = product.id;
+    trackCommerceEvent("view_item", {
+      currency: product.currencyCode || "GBP",
+      value: displayVariant?.price || product.price,
+      items: [{ item_id: product.id, item_name: product.name, item_variant: displayVariant?.title, price: displayVariant?.price || product.price, quantity: 1 }],
+    });
+  }, [displayVariant?.price, displayVariant?.title, product]);
   const wished = wishlist.some((item) => item.id === product.id);
   const productSchema = {
     "@context": "https://schema.org",
@@ -23,9 +51,9 @@ export function ProductDetail({ product }: { product: Product }) {
     sku: product.sku,
     offers: {
       "@type": "Offer",
-      priceCurrency: "GBP",
-      price: product.price.toFixed(2),
-      availability: product.inventory > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
+      priceCurrency: product.currencyCode || "GBP",
+      price: (displayVariant?.price || product.price).toFixed(2),
+      availability: canAdd ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
       url: `https://www.agloryhairandcosmetics.co.uk/products/${product.slug}`,
     },
   };
@@ -38,12 +66,17 @@ export function ProductDetail({ product }: { product: Product }) {
       { "@type": "ListItem", position: 3, name: product.name, item: `https://www.agloryhairandcosmetics.co.uk/products/${product.slug}` },
     ],
   };
-  const addProduct = () => {
-    addToCart(product, option || undefined, quantity);
-    setAdded(true);
+  const addProduct = async () => {
+    try {
+      await addToCart(product, selectedVariant?.id || displayVariant?.id, quantity);
+      setAdded(true);
+    } catch {
+      setAdded(false);
+    }
   };
   return (
     <section className="product-detail container section-space">
+      <RecentlyViewedTracker currentProduct={product} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(productSchema) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
       <nav className="breadcrumbs" aria-label="Breadcrumb">
@@ -53,69 +86,63 @@ export function ProductDetail({ product }: { product: Product }) {
       </nav>
       <div className="product-detail-grid">
         <div className="product-detail-image">
-          <Image src={product.image} alt={product.imageAlt} width={1000} height={1200} sizes="(max-width: 900px) 100vw, 55vw" preload />
+          <SkeletonImage
+            src={displayVariant?.image || product.image}
+            alt={product.imageAlt}
+            width={1000}
+            height={1200}
+            sizes="(max-width: 900px) 100vw, 55vw"
+            preload
+            containerClassName="w-full h-full min-h-[420px] lg:min-h-[620px]"
+          />
         </div>
         <div className="product-detail-copy">
           <Link className="product-brand-link" href={`/brands/${product.brand.toLowerCase().replaceAll(" ", "-")}`}>
             {product.brand}
           </Link>
           <h1>{product.name}</h1>
-          <div className={`stock-state detail-stock ${product.inventory <= 0 ? "is-out" : product.inventory <= 5 ? "is-low" : ""}`}>
-            {product.inventory <= 0
-              ? "Currently unavailable"
-              : product.inventory <= 5
-                ? `Only ${product.inventory} left`
-                : "In stock"}
+          <div className={`stock-state detail-stock ${displayVariant && !displayVariant.availableForSale ? "is-out" : ""}`}>
+            {!selectedVariant && optionGroups.length
+              ? "Choose options to check availability"
+              : displayVariant?.availableForSale ? "In stock" : "Currently unavailable"}
           </div>
           <div className="detail-price">
-            {money(product.price)}{" "}
-            {product.compareAt && <del>{money(product.compareAt)}</del>}
+            {money(displayVariant?.price || product.price, product.currencyCode)}{" "}
+            {(displayVariant?.compareAt || product.compareAt) && <del>{money(displayVariant?.compareAt || product.compareAt || 0, product.currencyCode)}</del>}
           </div>
           <p>{product.description}</p>
           <span className="sku">SKU: {product.sku}</span>
-          {product.options && (
+          {optionGroups.length > 0 && (
             <div className="detail-options">
-              <div className="option-label">
-                <span className="eyebrow">
-                  {product.type === "Makeup"
-                    ? "Choose your shade"
-                    : "Choose your option"}
-                </span>
-                <strong>{option || "Select an option"}</strong>
-              </div>
-              <div className="option-grid">
-                {product.options.map((item, index) => (
-                  <button
-                    type="button"
-                    key={item}
-                    disabled={index === 6 && product.id === "black-opal"}
-                    className={`${option === item ? "selected" : ""} ${index === 6 && product.id === "black-opal" ? "sold-out" : ""}`}
-                    onClick={() => {
-                      setOption(item);
-                      setAdded(false);
-                    }}
-                  >
-                    {item}
-                  </button>
-                ))}
-              </div>
+              {optionGroups.map((group) => (
+                <fieldset className="mb-4" key={group.name}>
+                  <legend className="option-label"><span className="eyebrow">Choose {group.name}</span><strong>{selectedOptions[group.name] || "Select an option"}</strong></legend>
+                  <div className="option-grid">
+                    {group.values.map((value) => {
+                      const available = isValueAvailable(group.name, value);
+                      return <button type="button" key={value} disabled={!available} aria-pressed={selectedOptions[group.name] === value} className={`${selectedOptions[group.name] === value ? "selected" : ""} ${!available ? "sold-out" : ""}`} onClick={() => { setSelectedOptions((current) => ({ ...current, [group.name]: value })); setAdded(false); }}>{value}</button>;
+                    })}
+                  </div>
+                </fieldset>
+              ))}
             </div>
           )}
+          <DeliveryTimer />
           <div className="quantity-row">
             <span className="eyebrow">Quantity</span>
             <div className="quantity-control">
               <button type="button" onClick={() => setQuantity((value) => Math.max(1, value - 1))} aria-label="Decrease quantity">−</button>
               <span aria-live="polite">{quantity}</span>
-              <button type="button" onClick={() => setQuantity((value) => Math.min(product.inventory, value + 1))} aria-label="Increase quantity">+</button>
+              <button type="button" onClick={() => setQuantity((value) => Math.min(99, value + 1))} aria-label="Increase quantity">+</button>
             </div>
           </div>
           <div className="detail-actions">
             <button
               className="button button-dark"
-              disabled={product.inventory <= 0 || Boolean(product.options && !option)}
+              disabled={!canAdd || isCartUpdating}
               onClick={addProduct}
             >
-              {added ? "Added to bag" : "Add to bag"} <ShoppingBag size={16} />
+              {isCartUpdating ? "Adding…" : added ? "Added to bag" : "Add to bag"} <ShoppingBag size={16} />
             </button>
             <button
               className={`modal-wish ${wished ? "is-active" : ""}`}
@@ -130,6 +157,7 @@ export function ProductDetail({ product }: { product: Product }) {
               Added to your bag. <Link href="/cart">View bag</Link>
             </p>
           )}
+          {cartError && <p className="inline-success" role="alert">{cartError}</p>}
           <div className="modal-notes">
             <span>
               <Check size={14} /> Delivery timing confirmed at checkout
@@ -141,12 +169,14 @@ export function ProductDetail({ product }: { product: Product }) {
               <MapPin size={14} /> Erith store collection available
             </span>
           </div>
+          <TrustPerks />
           <div className="collection-note">
             Collection from 8 Cross Street, Erith can be selected at checkout.
             Availability is confirmed against your order.
           </div>
         </div>
       </div>
+      <FrequentlyBoughtTogether product={product} />
       <div className="detail-accordions">
         <details open>
           <summary>Description</summary>
@@ -207,18 +237,19 @@ export function ProductDetail({ product }: { product: Product }) {
           </Link>
         </div>
         <ProductGrid
-          items={products.filter((item) => item.id !== product.id).slice(0, 4)}
+          items={catalog.filter((item) => item.id !== product.id).slice(0, 4)}
         />
       </section>
+      <RecentlyViewedSection excludeId={product.id} />
       <div className="mobile-sticky-product-cta">
-        <span>{money(product.price)}</span>
+        <span>{money(displayVariant?.price || product.price, product.currencyCode)}</span>
         <button
           type="button"
           className="button button-dark"
-          disabled={product.inventory <= 0 || Boolean(product.options && !option)}
+          disabled={!canAdd || isCartUpdating}
           onClick={addProduct}
         >
-          {product.options && !option ? "Choose an option" : "Add to bag"}
+          {optionGroups.length && !selectedVariant ? "Choose options" : "Add to bag"}
           <ShoppingBag size={15} />
         </button>
       </div>

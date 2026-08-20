@@ -1,6 +1,8 @@
+import { CookieResetButton } from "@/components/cookie-policy-actions";
+
 export const metadata = {
-  title: "Cookie Policy | A-Glory Hair and Cosmetics",
-  description: "How A-Glory Hair and Cosmetics uses cookies and similar technologies.",
+  title: "Cookie Policy | Aglory Hair and Cosmetics",
+  description: "How Aglory Hair and Cosmetics uses cookies and similar technologies.",
 };
 
 export default function CookiesPage() {
@@ -18,6 +20,7 @@ export default function CookiesPage() {
         <p>Where enabled, these help us understand site performance and remember useful preferences. We will ask for consent where required.</p>
         <h2>Questions</h2>
         <p>For questions about privacy or cookies, contact info@agloryhairandcosmetics.co.uk.</p>
+        <CookieResetButton />
       </div>
     </section>
   );

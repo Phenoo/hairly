@@ -1,8 +1,11 @@
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
-import { categories, categorySlug, products } from "@/lib/store-data";
+import { categories } from "@/lib/store-data";
 import { ShopCatalog } from "@/components/route-ui";
 import type { Metadata } from "next";
+import { getCatalogCollection, getCatalogPage } from "@/lib/catalog";
+import { ProductGridSkeleton } from "@/components/product-card";
+
 export function generateStaticParams() {
   return categories.map((category) => ({ slug: category.slug }));
 }
@@ -10,8 +13,8 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const { slug } = await params;
   const category = categories.find((item) => item.slug === slug);
   return category
-    ? { title: `${category.name} | A-Glory Hair and Cosmetics`, description: `${category.name} for every texture, tone and routine at A-Glory Hair and Cosmetics.` }
-    : { title: "Collection | A-Glory Hair and Cosmetics" };
+    ? { title: `${category.name} | Aglory Hair and Cosmetics`, description: `${category.name} for every texture, tone and routine at Aglory Hair and Cosmetics.` }
+    : { title: "Collection | Aglory Hair and Cosmetics" };
 }
 export default async function CategoryPage({
   params,
@@ -21,19 +24,24 @@ export default async function CategoryPage({
   const { slug } = await params;
   const category = categories.find((item) => item.slug === slug);
   if (!category) notFound();
-  const items = products.filter(
-    (product) => categorySlug(product.category) === slug,
-  );
+  const catalog = category.shopifyHandle
+    ? await getCatalogCollection(category.shopifyHandle, [], category.shopifyQuery)
+    : await getCatalogPage({ first: 24, query: category.shopifyQuery });
   return (
     <Suspense
       fallback={
         <div className="route-page container section-space">
-          <p>Loading products…</p>
+          <div className="page-kicker">
+            <div className="skeleton-line skeleton-eyebrow skeleton-shimmer" />
+            <div className="skeleton-line skeleton-title-1 skeleton-shimmer" style={{ width: "280px", height: "36px" }} />
+          </div>
+          <ProductGridSkeleton count={8} />
         </div>
       }
     >
       <ShopCatalog
-        items={items}
+        items={catalog.products}
+        pageInfo={catalog.pageInfo}
         eyebrow={category.name}
         title={
           <>
@@ -44,3 +52,4 @@ export default async function CategoryPage({
     </Suspense>
   );
 }
+

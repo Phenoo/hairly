@@ -1,16 +1,13 @@
 import { notFound } from "next/navigation";
-import { products, getProduct } from "@/lib/store-data";
 import { ProductDetail } from "@/components/product-detail";
 import type { Metadata } from "next";
-export function generateStaticParams() {
-  return products.map((product) => ({ slug: product.slug }));
-}
+import { getCatalogProduct } from "@/lib/catalog";
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
-  const product = getProduct(slug);
+  const product = await getCatalogProduct(slug);
   return product
-    ? { title: `${product.name} | A-Glory Hair and Cosmetics`, description: product.description }
-    : { title: "Product | A-Glory Hair and Cosmetics" };
+    ? { title: `${product.name} | Aglory Hair and Cosmetics`, description: product.description, alternates: { canonical: `/products/${product.slug}` }, openGraph: { title: `${product.name} | Aglory Hair and Cosmetics`, description: product.description, images: [{ url: product.image, alt: product.imageAlt }] } }
+    : { title: "Product | Aglory Hair and Cosmetics" };
 }
 export default async function ProductPage({
   params,
@@ -18,7 +15,7 @@ export default async function ProductPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const product = getProduct(slug);
+  const product = await getCatalogProduct(slug);
   if (!product) notFound();
   return <ProductDetail product={product} />;
 }

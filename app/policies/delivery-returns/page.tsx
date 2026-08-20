@@ -1,6 +1,6 @@
 import { UtilityPage } from "@/components/route-ui";
 export const metadata = {
-  title: "Delivery & Returns | A-Glory Hair and Cosmetics",
+  title: "Delivery & Returns | Aglory Hair and Cosmetics",
 };
 export default function DeliveryReturnsRoute() {
   return (
@@ -17,7 +17,7 @@ export default function DeliveryReturnsRoute() {
         <section>
           <h2>Delivery</h2>
           <p>
-            Online checkout is not connected yet. The A-Glory team confirms
+            Online checkout is not connected yet. The Aglory team confirms
             delivery availability, timing and price before taking payment.
           </p>
         </section>
@@ -38,7 +38,7 @@ export default function DeliveryReturnsRoute() {
         <section>
           <h2>Need help?</h2>
           <p>
-            <a href="/contact">Contact the A-Glory team</a> or message us on
+            <a href="/contact">Contact the Aglory team</a> or message us on
             WhatsApp and we’ll help with your order.
           </p>
         </section>

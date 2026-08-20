@@ -1,6 +1,6 @@
 import { UtilityPage } from "@/components/route-ui";
 
-export const metadata = { title: "Terms | A-Glory Hair and Cosmetics" };
+export const metadata = { title: "Terms | Aglory Hair and Cosmetics" };
 
 export default function TermsRoute() {
   return (
@@ -11,7 +11,7 @@ export default function TermsRoute() {
           Simple <em>terms.</em>
         </>
       }
-      body="The basic terms for browsing A-Glory, placing an order and getting in touch with our team."
+      body="The basic terms for browsing Aglory, placing an order and getting in touch with our team."
     >
       <div className="policy-grid">
         <section>

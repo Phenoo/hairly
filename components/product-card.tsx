@@ -1,12 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { ArrowUpRight, Heart } from "lucide-react";
 import { useState } from "react";
 import type { Product } from "@/lib/store-data";
 import { money } from "@/lib/store-data";
 import { useStorefront } from "@/lib/storefront-context";
+import { SkeletonImage } from "@/components/ui/skeleton-image";
 
 export function ProductCard({ product }: { product: Product }) {
   const { wishlist, toggleWishlist, addToCart } = useStorefront();
@@ -24,12 +24,13 @@ export function ProductCard({ product }: { product: Product }) {
       </button>
       <Link className="product-image" href={`/products/${product.slug}`}>
         {product.tag && <span className="product-tag">{product.tag}</span>}
-        <Image
+        <SkeletonImage
           src={product.image}
           alt={product.imageAlt}
           width={720}
           height={900}
           sizes="(max-width: 600px) 50vw, (max-width: 900px) 50vw, 25vw"
+          containerClassName="w-full h-full"
         />
         <span className="quick-view">
           View product <ArrowUpRight size={14} />
@@ -47,12 +48,12 @@ export function ProductCard({ product }: { product: Product }) {
         )}
         <div className="product-foot">
           <div className="product-pricing">
-            <span className="price">{money(product.price)}</span>
+            <span className="price">{money(product.price, product.currencyCode)}</span>
             {product.compareAt && (
-              <span className="compare">{money(product.compareAt)}</span>
+              <span className="compare">{money(product.compareAt, product.currencyCode)}</span>
             )}
           </div>
-          {product.options ? (
+          {product.optionGroups?.length ? (
             <Link className="quick-add" href={`/products/${product.slug}`}>
               Choose options
             </Link>
@@ -62,8 +63,7 @@ export function ProductCard({ product }: { product: Product }) {
               className="quick-add"
               disabled={product.inventory <= 0}
               onClick={() => {
-                addToCart(product);
-                setAdded(true);
+                void addToCart(product).then(() => setAdded(true)).catch(() => setAdded(false));
               }}
             >
               {product.inventory <= 0 ? "Unavailable" : added ? "Added" : "Add to bag"}
@@ -78,6 +78,35 @@ export function ProductCard({ product }: { product: Product }) {
   );
 }
 
+export function ProductCardSkeleton() {
+  return (
+    <article className="product-card skeleton-card" aria-hidden="true">
+      <div className="product-image skeleton-shimmer">
+        <div className="w-full h-full" />
+      </div>
+      <div className="product-copy">
+        <div className="skeleton-line skeleton-eyebrow skeleton-shimmer" />
+        <div className="skeleton-line skeleton-title-1 skeleton-shimmer" />
+        <div className="skeleton-line skeleton-title-2 skeleton-shimmer" />
+        <div className="product-foot">
+          <div className="skeleton-line skeleton-price skeleton-shimmer" />
+          <div className="skeleton-line skeleton-btn skeleton-shimmer" />
+        </div>
+      </div>
+    </article>
+  );
+}
+
+export function ProductGridSkeleton({ count = 8 }: { count?: number }) {
+  return (
+    <div className="product-grid shop-grid" aria-label="Loading products" aria-busy="true">
+      {Array.from({ length: count }).map((_, i) => (
+        <ProductCardSkeleton key={i} />
+      ))}
+    </div>
+  );
+}
+
 export function ProductGrid({ items }: { items: Product[] }) {
   return (
     <div className="product-grid shop-grid">
@@ -87,3 +116,4 @@ export function ProductGrid({ items }: { items: Product[] }) {
     </div>
   );
 }
+

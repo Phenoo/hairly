@@ -1,5 +1,16 @@
 export type ProductType = "Hair" | "Wigs" | "Skin" | "Makeup" | "Tools" | "Men";
 
+export type ProductVariant = {
+  id: string;
+  title: string;
+  availableForSale: boolean;
+  quantityAvailable?: number;
+  price: number;
+  compareAt?: number;
+  selectedOptions: { name: string; value: string }[];
+  image?: string;
+};
+
 export type Product = {
   id: string;
   slug: string;
@@ -14,12 +25,19 @@ export type Product = {
   tag?: string;
   description: string;
   options?: string[];
+  optionGroups?: { name: string; values: string[] }[];
+  currencyCode?: string;
   inventory: number;
   sku: string;
   details?: { label: string; value: string }[];
   howToUse?: string;
   ingredients?: string;
+  /** Shopify merchandise ID used when adding this item to the cart. */
+  defaultVariantId?: string;
+  variants?: ProductVariant[];
 };
+
+export const DEFAULT_PRODUCT_IMAGE = "/unavailable_product.png";
 
 export const image = (id: string, width = 900) =>
   `https://images.unsplash.com/${id}?auto=format&fit=crop&w=${width}&q=85`;
@@ -264,36 +282,44 @@ export const categories = [
     name: "Hair care",
     note: "Rituals for every texture",
     image: image("photo-1522337360788-8b13dee7a37e"),
+    shopifyHandle: "hair-care-1",
   },
   {
     slug: "wigs-extensions",
     name: "Wigs & extensions",
     note: "Your next signature style",
     image: image("photo-1519699047748-de8e457a634e"),
+    shopifyHandle: "hair-extensions-wigs",
   },
   {
     slug: "skin-body",
     name: "Skin & body",
     note: "Glow from the neck down",
     image: image("photo-1556229010-6c3f2c9ca5f8"),
+    shopifyHandle: "skin-care",
+    shopifyQuery: 'product_type:"Skin & Body Care"',
   },
   {
     slug: "makeup",
     name: "Makeup",
     note: "Colour with intention",
     image: image("photo-1596462502278-27bfdc403348"),
+    shopifyHandle: "makeup",
   },
   {
     slug: "mens-grooming",
     name: "Men’s grooming",
     note: "Everyday care",
     image: image("photo-1621605815971-fbc98d665033"),
+    shopifyQuery: "tag:Men",
   },
   {
     slug: "tools-accessories",
     name: "Tools & accessories",
     note: "Finish the look",
     image: image("photo-1522335789203-aabd1fc54bc9"),
+    shopifyHandle: "tools-accessories",
+    shopifyQuery: "product_type:Accessories",
   },
 ];
 
@@ -318,18 +344,24 @@ export const collections = [
     name: "Protective Styling Edit",
     description: "Braiding hair, texture and finishing essentials for your next protective style.",
     productIds: ["darling-empress", "soft-silky"],
+    shopifyHandle: "hair-extensions-wigs",
+    shopifyQuery: 'product_type:"Hair Extensions & Wigs"',
   },
   {
     slug: "wash-day",
     name: "Wash Day Edit",
     description: "A considered starting point for softer strands, nourished roots and an easier wash day.",
     productIds: ["virgin-fertilizer", "dexe-serum", "dexe-mask"],
+    shopifyHandle: "hair-care-1",
+    shopifyQuery: 'product_type:"Hair Care"',
   },
   {
     slug: "wig-care",
     name: "Wig Care Edit",
     description: "Simple care essentials to help keep your wig routine polished between wears.",
     productIds: ["darling-empress", "toppik"],
+    shopifyHandle: "wigs",
+    shopifyQuery: 'product_type:"Hair Extensions & Wigs"',
   },
 ];
 
@@ -367,4 +399,5 @@ export const getProduct = (slug: string) =>
   products.find((product) => product.slug === slug);
 export const getBlogPost = (slug: string) =>
   blogPosts.find((post) => post.slug === slug);
-export const money = (amount: number) => `£${amount.toFixed(2)}`;
+export const money = (amount: number, currency = "GBP") =>
+  new Intl.NumberFormat("en-GB", { style: "currency", currency }).format(amount);
